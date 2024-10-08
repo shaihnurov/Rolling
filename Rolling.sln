@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rolling", "Rolling\Rolling.csproj", "{0458CDA3-1B91-4AB3-BCEE-60462C2CFCBD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0458CDA3-1B91-4AB3-BCEE-60462C2CFCBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0458CDA3-1B91-4AB3-BCEE-60462C2CFCBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0458CDA3-1B91-4AB3-BCEE-60462C2CFCBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0458CDA3-1B91-4AB3-BCEE-60462C2CFCBD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
