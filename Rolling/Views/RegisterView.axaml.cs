@@ -1,11 +1,10 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 
 namespace Rolling.Views;
 
-public partial class MainWindow : Window
+public partial class RegisterView : UserControl
 {
-    public MainWindow()
+    public RegisterView()
     {
         InitializeComponent();
     }

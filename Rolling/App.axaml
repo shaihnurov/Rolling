@@ -1,9 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
              x:Class="Rolling.App"
              xmlns:local="using:Rolling"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -12,4 +12,8 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+             
+     <Application.Styles>
+         <actipro:ModernTheme Includes="Pro" />
+     </Application.Styles>
 </Application>

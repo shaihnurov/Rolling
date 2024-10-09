@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Rolling.ViewModels"
+             x:DataType="vm:RegisterViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
+             x:Class="Rolling.Views.RegisterView">
+	
+	<Design.DataContext>
+		<vm:RegisterViewModel/>
+	</Design.DataContext>
+	
+	<Grid>
+        <Border CornerRadius="20" BorderBrush="Orange" BorderThickness="1" MaxWidth="800" MaxHeight="800" MinHeight="400" MinWidth="600"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid>
+                <Grid IsVisible="{Binding IsVisibleUserData}">
+	                <Grid.RowDefinitions>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
+	                </Grid.RowDefinitions>
+
+	                <TextBlock Grid.Row="1" Text="Registration" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
+	                           FontSize="30" FontWeight="Bold"/>
+                
+	                <TextBox Grid.Row="2" Watermark="Enter your Name" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Name}"/>
+                
+	                <TextBox Grid.Row="3" Watermark="Age" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                         Margin="0 20 0 0" Text="{Binding Age}"/>
+                
+	                <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}"/>
+                
+	                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="*" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Password}"/>
+                
+	                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Register"
+	                        Command="{Binding RegisterUserCommand}" IsEnabled="{Binding RegBtn}"/>
+                </Grid>
+	            
+	            <Grid IsVisible="{Binding IsVisibleInputCode}">
+		            <Grid.RowDefinitions>
+			            <RowDefinition Height="Auto"/>
+			            <RowDefinition Height="Auto"/>
+			            <RowDefinition Height="Auto"/>
+			            <RowDefinition Height="Auto"/>
+			            <RowDefinition Height="Auto"/>
+		            </Grid.RowDefinitions>
+
+		            <TextBlock Grid.Row="1" Text="Mail Confirmation" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
+		                       FontSize="30" FontWeight="Bold"/>
+		            
+		            <TextBlock Grid.Row="2" Text="A confirmation code has been sent to your e-mail" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
+		                       FontSize="15" FontWeight="Bold"/>
+                
+		            <TextBox Grid.Row="3" Watermark="Enter code" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+		                     Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Code}"/>
+                
+		            <Button Grid.Row="4" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Confirm"
+		                    Command="{Binding ConfirmCodeRegCommand}" IsEnabled="{Binding RegBtn}"/>
+	            </Grid>
+            </Grid>
+		</Border>
+	</Grid>
+</UserControl>
