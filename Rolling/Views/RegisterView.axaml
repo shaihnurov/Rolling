@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Rolling.ViewModels"
+             xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
              x:DataType="vm:RegisterViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
              x:Class="Rolling.Views.RegisterView">
@@ -12,8 +13,8 @@
 	</Design.DataContext>
 	
 	<Grid>
-        <Border CornerRadius="20" BorderBrush="Orange" BorderThickness="1" MaxWidth="800" MaxHeight="800" MinHeight="400" MinWidth="600"
-                HorizontalAlignment="Center" VerticalAlignment="Center">
+		<actipro:ShadowChrome Elevation="8" IsShadowEnabled="True" MaxWidth="1200" MaxHeight="800" MinHeight="450" MinWidth="1000"
+		                      HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid>
                 <Grid IsVisible="{Binding IsVisibleUserData}">
 	                <Grid.RowDefinitions>
@@ -29,16 +30,17 @@
 	                <TextBlock Grid.Row="1" Text="Registration" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
 	                           FontSize="30" FontWeight="Bold"/>
                 
-	                <TextBox Grid.Row="2" Watermark="Enter your Name" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                <TextBox Grid.Row="2" Watermark="Enter your Name" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Name}"/>
                 
-	                <TextBox Grid.Row="3" Watermark="Age" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                <TextBox Grid.Row="3" Watermark="Age" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 	                         Margin="0 20 0 0" Text="{Binding Age}"/>
                 
-	                <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}"/>
                 
-	                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="*" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+	                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="{actipro:ThemeResource EditPasswordChar}" 
+	                         HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft has-reveal-password-button"
 	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Password}"/>
                 
 	                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Register"
@@ -54,19 +56,21 @@
 			            <RowDefinition Height="Auto"/>
 		            </Grid.RowDefinitions>
 
-		            <TextBlock Grid.Row="1" Text="Mail Confirmation" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
+		            <TextBlock Grid.Row="1" Text="Enter Code" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
 		                       FontSize="30" FontWeight="Bold"/>
 		            
-		            <TextBlock Grid.Row="2" Text="A confirmation code has been sent to your e-mail" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
-		                       FontSize="15" FontWeight="Bold"/>
+					<StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0 20 0 0" Orientation="Horizontal">
+						<TextBlock Text="A confirmation code has been sent to your e-mail "  TextTrimming="CharacterEllipsis" FontSize="15"/>
+						<TextBlock Text="{Binding Email}"  TextTrimming="CharacterEllipsis" FontSize="15" FontWeight="Bold"/>
+					</StackPanel>
                 
-		            <TextBox Grid.Row="3" Watermark="Enter code" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+		            <TextBox Grid.Row="3" Watermark="Enter code" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 		                     Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Code}"/>
                 
-		            <Button Grid.Row="4" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Confirm"
+		            <Button Grid.Row="4" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Confirm" Classes="theme-soft"
 		                    Command="{Binding ConfirmCodeRegCommand}" IsEnabled="{Binding RegBtn}"/>
 	            </Grid>
             </Grid>
-		</Border>
+		</actipro:ShadowChrome>
 	</Grid>
 </UserControl>

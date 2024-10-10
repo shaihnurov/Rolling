@@ -13,9 +13,9 @@
 	</Design.DataContext>
 	
 	<Grid>
-        <Border CornerRadius="20" BorderBrush="Orange" BorderThickness="1" MaxWidth="400" MaxHeight="400" MinHeight="280" MinWidth="300"
-                HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid>
+        <actipro:ShadowChrome Elevation="8" IsShadowEnabled="True" MaxWidth="1200" MaxHeight="800" MinHeight="450" MinWidth="1000"
+                              HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -30,14 +30,15 @@
                            FontSize="30" FontWeight="Bold"/>
                 
                 <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
-                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}"/>
+                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}" Classes="theme-soft"/>
                 
-                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="*" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="{actipro:ThemeResource EditPasswordChar}" 
+                         HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft has-reveal-password-button"
                          Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Password}"/>
                 
-                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 20 0 0" Content="Auth"
+                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 20 0 0" Content="Auth" Classes="theme-soft has-reveal-password-button"
                         Command="{Binding RegisterUserCommand}" IsEnabled="{Binding RegBtn}"/>
             </Grid>
-		</Border>
+		</actipro:ShadowChrome>
 	</Grid>
 </UserControl>

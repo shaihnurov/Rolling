@@ -36,7 +36,7 @@ namespace Rolling.ViewModels
         
         private bool _isInfoBarVisible = false;
         private string _messageInfoBar;
-        private string _titleTextInfoBar = "Auth";
+        private string _titleTextInfoBar;
         private int _statusInfoBar;
         private bool _isVisibleBtnAuthOrReg = true;
         private bool _isVisibleBtnUserAcc;

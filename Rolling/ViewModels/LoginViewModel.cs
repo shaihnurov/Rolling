@@ -21,7 +21,25 @@ namespace Rolling.ViewModels
         public string Email
         {
             get => _email;
-            set => SetProperty(ref _email, value);
+            set
+            {
+                if (IsValidEmail(value))
+                {
+                    SetProperty(ref _email, value);
+                }
+                else
+                {
+                    _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
+                    _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.StatusInfoBar = 3;
+                    
+                    Task.Run(async() =>
+                    {
+                        await Task.Delay(3000);
+                        _mainWindowViewModel.IsInfoBarVisible = false;
+                    });
+                }
+            }
         }
         public string Password
         {
@@ -43,9 +61,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel!.TitleTextInfoBar = "Auth";
                     _mainWindowViewModel!.MessageInfoBar = "Please fill in all available fields";
                     _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 0;
+                    _mainWindowViewModel.StatusInfoBar = 2;
 
                     await Task.Delay(3000);
                     _mainWindowViewModel.IsInfoBarVisible = false;
@@ -101,6 +120,10 @@ namespace Rolling.ViewModels
                     _mainWindowViewModel.IsInfoBarVisible = false;
                 }
             }
+        }
+        private bool IsValidEmail(string email)
+        {
+            return !string.IsNullOrEmpty(email) && email.Contains("@") && email.Contains(".");
         }
     }
 }

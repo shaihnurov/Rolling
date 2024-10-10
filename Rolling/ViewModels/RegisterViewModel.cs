@@ -15,7 +15,7 @@ namespace Rolling.ViewModels
 {
     public class RegisterViewModel : ObservableObject
     {
-        private const string FromPassword = "YOUR SMTP PASSWORD";
+        private const string FromPassword = "YOUR PASS";
         private const string FromAddress = "YOUR_EMAIL@gmail.com";
         private string _verifyCode;
         
@@ -40,7 +40,25 @@ namespace Rolling.ViewModels
         public string Email
         {
             get => _email;
-            set => SetProperty(ref _email, value);
+            set
+            {
+                if (IsValidEmail(value))
+                {
+                    SetProperty(ref _email, value);
+                }
+                else
+                {
+                    _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
+                    _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.StatusInfoBar = 3;
+                    
+                    Task.Run(async() =>
+                    {
+                        await Task.Delay(3000);
+                        _mainWindowViewModel.IsInfoBarVisible = false;
+                    });
+                }
+            }
         }
         public string Password
         {
@@ -61,6 +79,12 @@ namespace Rolling.ViewModels
                     _mainWindowViewModel.MessageInfoBar = "Please state your correct age";
                     _mainWindowViewModel.IsInfoBarVisible = true;
                     _mainWindowViewModel.StatusInfoBar = 3;
+                    
+                    Task.Run(async() =>
+                    {
+                        await Task.Delay(3000);
+                        _mainWindowViewModel.IsInfoBarVisible = false;
+                    });
                 }
             }
         }
@@ -94,9 +118,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel!.TitleTextInfoBar = "Register";
                     _mainWindowViewModel!.MessageInfoBar = "Please fill in all available fields";
                     _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 0;
+                    _mainWindowViewModel.StatusInfoBar = 2;
 
                     await Task.Delay(3000);
                     _mainWindowViewModel.IsInfoBarVisible = false;
@@ -109,58 +134,60 @@ namespace Rolling.ViewModels
 
         private async Task BtnSendCodeUser()
         {
-            IsVisibleInputCode = true;
-            IsVisibleUserData = false;
+            using (ApplicationContextDb db = new())
+            {
+                var uniqueEmail = await db.UserModels.Where(s => s.Email == Email).ToListAsync();
 
-            _verifyCode = GenerateCode();
-            await SendVerificationCode(Email, _verifyCode);
+                if (uniqueEmail.Count == 0)
+                {
+                    IsVisibleInputCode = true;
+                    IsVisibleUserData = false;
+                    
+                    _verifyCode = GenerateCode();
+                    await SendVerificationCode(Email, _verifyCode);
+                }
+                else
+                {
+                    _mainWindowViewModel.MessageInfoBar = "This mail is occupied by another user";
+                    _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.StatusInfoBar = 3;
+                
+                    await Task.Delay(3000);
+                    _mainWindowViewModel.IsInfoBarVisible = false;
+                }
+            }
         }
         private async Task RegisterUser()
         {
             using (ApplicationContextDb db = new())
             {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(Password);
-                var uniqueEmail = await db.UserModels.Where(s => s.Email == Email).ToListAsync();
-                
-                if (uniqueEmail.Count == 0)
+                if (_verifyCode == Code)
                 {
-                    if (_verifyCode == Code)
+                    var userModel = new UserModel
                     {
-                        var userModel = new UserModel
-                        {
-                            Name = Name,
-                            Age = int.Parse(Age),
-                            Email = Email,
-                            Password = hashedPassword
-                        };
+                        Name = Name,
+                        Age = int.Parse(Age),
+                        Email = Email,
+                        Password = BCrypt.Net.BCrypt.HashPassword(Password)
+                    };
                 
-                        await db.UserModels.AddAsync(userModel);
-                        await db.SaveChangesAsync();
+                    await db.UserModels.AddAsync(userModel);
+                    await db.SaveChangesAsync();
 
-                        _mainWindowViewModel.IsVisibleBtnUserAcc = true;
-                        _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
-                        _mainWindowViewModel.MessageInfoBar = "Registration successfully completed";
-                        _mainWindowViewModel.IsInfoBarVisible = true;
-                        _mainWindowViewModel.StatusInfoBar = 1;
+                    _mainWindowViewModel.IsVisibleBtnUserAcc = true;
+                    _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
+                    _mainWindowViewModel.MessageInfoBar = "Registration successfully completed";
+                    _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.StatusInfoBar = 1;
                     
-                        _mainWindowViewModel.CurrentView = new HomeViewModel();
+                    _mainWindowViewModel.CurrentView = new HomeViewModel();
                 
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;   
-                    }
-                    else
-                    {
-                        _mainWindowViewModel.MessageInfoBar = "You have entered an invalid code";
-                        _mainWindowViewModel.IsInfoBarVisible = true;
-                        _mainWindowViewModel.StatusInfoBar = 3;
-                
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;
-                    }
+                    await Task.Delay(3000);
+                    _mainWindowViewModel.IsInfoBarVisible = false;   
                 }
                 else
                 {
-                    _mainWindowViewModel.MessageInfoBar = "This mail is already registered";
+                    _mainWindowViewModel.MessageInfoBar = "You have entered an invalid code";
                     _mainWindowViewModel.IsInfoBarVisible = true;
                     _mainWindowViewModel.StatusInfoBar = 3;
                 
@@ -180,8 +207,8 @@ namespace Rolling.ViewModels
             var fromAddress = new MailAddress(FromAddress, "Rolling");
             var toAddress = new MailAddress(email);
             
-            const string subject = "Код подтверждения";
-            string body = $"Ваш код подтверждения -> {code}";
+            const string subject = "Registering an account with Rolling";
+            string body = $"{Name}, your confirmation code - {code}";
 
             var smtp = new SmtpClient()
             {
@@ -224,6 +251,10 @@ namespace Rolling.ViewModels
         private bool IsNumeric(string age)
         {
             return !string.IsNullOrEmpty(age) && age.All(char.IsDigit);
+        }
+        private bool IsValidEmail(string email)
+        {
+            return !string.IsNullOrEmpty(email) && email.Contains("@") && email.Contains(".");
         }
     }
 }
