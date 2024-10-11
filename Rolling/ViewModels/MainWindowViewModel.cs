@@ -1,24 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Avalonia;
-using Avalonia.Media;
-using System.Reactive.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Rolling.Models;
-using Tmds.DBus.Protocol;
+using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
     public class MainWindowViewModel : ObservableObject
     {
+        private readonly IUserService _userService;
+        public IUserService UserService => _userService;
+        
         private int _state = 0;
         private object _currentView;
         private string _btnRegOrAuthText;
@@ -40,6 +31,7 @@ namespace Rolling.ViewModels
         private int _statusInfoBar;
         private bool _isVisibleBtnAuthOrReg = true;
         private bool _isVisibleBtnUserAcc;
+        private string _titleText;
         
         public bool IsInfoBarVisible
         {
@@ -71,18 +63,33 @@ namespace Rolling.ViewModels
             get => _isVisibleBtnAuthOrReg;
             set => SetProperty(ref _isVisibleBtnAuthOrReg, value);
         }
+        public string TitleText
+        {
+            get => _titleText;
+            set => SetProperty(ref _titleText, value);
+        }
         
         private RegisterViewModel RegisterViewModel { get; set; }
         private LoginViewModel LoginViewModel { get; set; }
+        private HomeViewModel HomeViewModel { get; set; }
+        private UserProfileViewModel UserProfileViewModel { get; set; }
         
         public RelayCommand BtnRegOrAuthCommand { get; set; }
+        public RelayCommand HomeViewCommand { get; set; }
+        public RelayCommand UserProfileCommand { get; set; }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IUserService userService)
         {
+            _userService = userService;
+            CheckUserToken();
+            
             BtnRegOrAuthText = "Do you have an account yet?";
+            TitleText = "Procces Authentication";
             
             RegisterViewModel = new RegisterViewModel(this);
             LoginViewModel = new LoginViewModel(this);
+            HomeViewModel = new HomeViewModel();
+            UserProfileViewModel = new UserProfileViewModel(this, _userService);
 
             CurrentView = LoginViewModel;
 
@@ -99,6 +106,45 @@ namespace Rolling.ViewModels
                     _state--;
                 }
             });
+            HomeViewCommand = new RelayCommand(() => {
+                CurrentView = HomeViewModel;
+                TitleText = "Home";
+            });
+            UserProfileCommand = new RelayCommand(() => {
+                CurrentView = UserProfileViewModel;
+                TitleText = "Profile";
+            });
+        }
+
+        private async void CheckUserToken()
+        {
+            UserData storedUserData = await UserDataStorage.GetUserData();
+
+            if (storedUserData != null && !string.IsNullOrEmpty(storedUserData.Token))
+            {
+                var claimsPrincipal = TokenService.ValidateToken(storedUserData.Token);
+
+                if (claimsPrincipal != null)
+                {
+                    IsVisibleBtnUserAcc = true;
+                    IsVisibleBtnAuthOrReg = false;
+                    CurrentView = HomeViewModel;
+                    TitleText = "Home";
+                }
+                else
+                {
+                    UserDataStorage.DeleteUserData();
+                    IsVisibleBtnUserAcc = false;
+                    IsVisibleBtnAuthOrReg = true;
+                    CurrentView = LoginViewModel;
+                }
+            }
+            else
+            {
+                IsVisibleBtnUserAcc = false;
+                IsVisibleBtnAuthOrReg = true;
+                CurrentView = LoginViewModel;
+            }
         }
     }
 }

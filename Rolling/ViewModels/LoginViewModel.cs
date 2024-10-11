@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -10,6 +11,7 @@ namespace Rolling.ViewModels
 {
     public class LoginViewModel : ObservableObject
     {
+        private bool _isCheckedSaveData;
         private bool _resultAuth;
         private string _email;
         private string _password;
@@ -17,7 +19,12 @@ namespace Rolling.ViewModels
 
         private readonly MainWindowViewModel _mainWindowViewModel;
         public AsyncRelayCommand RegisterUserCommand { get; set; }
-        
+
+        public bool IsCheckedSaveData
+        {
+            get => _isCheckedSaveData;
+            set => SetProperty(ref _isCheckedSaveData, value);
+        }
         public string Email
         {
             get => _email;
@@ -89,6 +96,29 @@ namespace Rolling.ViewModels
 
                     if (_resultAuth)
                     {
+                        if (IsCheckedSaveData == true)
+                        {
+                            string token = TokenService.GenerateToken(Email);
+                            var userData = new UserData
+                            {
+                                Token = token,
+                                Email = Email,
+                                ExpiryDate = DateTime.UtcNow.AddDays(7)
+                            };
+                            
+                            await UserDataStorage.SaveUserData(userData);
+                        }
+                        else
+                        {
+                            var userData = new UserData
+                            {
+                                Email = Email
+                            };
+
+                            await UserDataStorage.SaveUserData(userData);
+                        }
+                        _mainWindowViewModel.UserService.UpdateUserData();
+
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                         _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
                         _mainWindowViewModel.MessageInfoBar = "Successful entry";

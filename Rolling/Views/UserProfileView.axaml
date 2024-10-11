@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Rolling.ViewModels"
+             xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+             x:DataType="vm:UserProfileViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
+             x:Class="Rolling.Views.UserProfileView">
+    
+    <Design.DataContext>
+        <vm:UserProfileViewModel/>
+    </Design.DataContext>
+    
+    <Border HorizontalAlignment="Center" VerticalAlignment="Center" >
+        <actipro:Card Title="{Binding UserName}" Description="{Binding UserEmail}"
+                      Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
+            <actipro:Card.Resources>
+                <actipro:ThicknessConverter x:Key="CoverPaddingConverter" Filter="Left,Top,Right" BaseThickness="0" />
+            </actipro:Card.Resources>
+
+            <actipro:Card.Cover>
+                <Border Margin="{Binding $parent[actipro:Card].Padding, Converter={StaticResource CoverPaddingConverter}}"
+                        CornerRadius="{actipro:ScaledCornerRadius 1}">
+                    <actipro:Avatar Height="{actipro:ScaledDouble '4+144'}"/>
+                </Border>
+            </actipro:Card.Cover>
+
+            <StackPanel Orientation="Vertical">
+                <WrapPanel Orientation="Horizontal">
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                   Text="Age "/>
+                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                   Text="{Binding UserAge}"/>
+                    </WrapPanel>
+                    
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="50 0 0 0">
+                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                   Text="Balance "/>
+                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                   Text="0"/>
+                    </WrapPanel>
+                </WrapPanel>
+                
+                <WrapPanel Orientation="Horizontal" Margin="0 20 0 0">
+                    <Button Classes="theme-solid accent" Content="Load Avatar" Margin="0 0 5 0"
+                            FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
+                    <Button Classes="theme-solid accent" Content="Refill Balance" Margin="5 0 0 0"
+                            FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
+                </WrapPanel>
+                <Button Classes="theme-solid accent" Content="Exit Account" Margin="0 6 0 0"
+                        FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" Command="{Binding ExitAccountCommand}"/>
+            </StackPanel>
+        </actipro:Card>
+    </Border>
+</UserControl>

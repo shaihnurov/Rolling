@@ -3,6 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using Rolling.Models;
+using Rolling.Service;
 using Rolling.ViewModels;
 using Rolling.Views;
 
@@ -22,9 +25,11 @@ public partial class App : Application
             // Line below is needed to remove Avalonia data validation.
             // Without this line you will get duplicate validations from both Avalonia and CT
             BindingPlugins.DataValidators.RemoveAt(0);
+            var serviceProvider = new ServiceCollection().AddSingleton<IUserService, UserService>().BuildServiceProvider();
+            var userService = serviceProvider.GetRequiredService<IUserService>();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel(userService),
             };
         }
 

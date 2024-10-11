@@ -23,21 +23,23 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
                 <TextBlock Grid.Row="1" Text="Authentication" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
                            FontSize="30" FontWeight="Bold"/>
                 
-                <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
+                <TextBox Grid.Row="2" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center"
                          Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}" Classes="theme-soft"/>
                 
-                <TextBox Grid.Row="5" Watermark="Password" PasswordChar="{actipro:ThemeResource EditPasswordChar}" 
+                <TextBox Grid.Row="3" Watermark="Password" PasswordChar="{actipro:ThemeResource EditPasswordChar}" 
                          HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft has-reveal-password-button"
                          Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Password}"/>
                 
-                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 20 0 0" Content="Auth" Classes="theme-soft has-reveal-password-button"
+                <Button Grid.Row="4" HorizontalAlignment="Center" Margin="0 20 0 0" Content="Auth" Classes="theme-soft has-reveal-password-button"
                         Command="{Binding RegisterUserCommand}" IsEnabled="{Binding RegBtn}"/>
+                
+                <ToggleSwitch Grid.Row="5" Classes="theme-solid warning" Content="Stay on the account?" HorizontalAlignment="Center" Margin="0 20 0 0"
+                              HorizontalContentAlignment="Center" IsChecked="{Binding IsCheckedSaveData}"/>
             </Grid>
 		</actipro:ShadowChrome>
 	</Grid>

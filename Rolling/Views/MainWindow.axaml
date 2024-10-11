@@ -38,7 +38,7 @@
 
 						<StackPanel Margin="10,7,0,7" VerticalAlignment="Center" IsHitTestVisible="False">
 							<TextBlock Text="Rolling" FontSize="12" TextTrimming="CharacterEllipsis" Opacity="0.85" />
-							<TextBlock Margin="0,-2,0,0" Text="Procces Authentication" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+							<TextBlock Margin="0,-2,0,0" Text="{Binding TitleText}" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
 						</StackPanel>
 					</StackPanel>
 				</primitives:OverlayInputFilter>
@@ -48,9 +48,14 @@
 				<primitives:OverlayInputFilter>
 					<StackPanel Margin="{Binding $parent[actipro:ChromedTitleBar].HasCaptionButtons, Converter={StaticResource RightContentMarginConverter}}" Orientation="Horizontal">
 						<Button ContentTemplate="{actipro:GlyphTemplate Avatar16}"
-						        Command="{Binding }"
+						        Command="{Binding UserProfileCommand}"
 						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
 						        ToolTip.Tip="Exit Account"/>
+						
+						<Button ContentTemplate="{actipro:GlyphTemplate Home16}"
+						        Command="{Binding HomeViewCommand}"
+						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
+						        ToolTip.Tip="Home"/>
 						
 						<Button VerticalAlignment="Center" Command="{Binding BtnRegOrAuthCommand}"
 						        Content="{Binding BtnRegOrAuthText}" Margin="0 2 10 0"

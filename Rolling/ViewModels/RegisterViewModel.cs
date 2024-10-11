@@ -15,7 +15,7 @@ namespace Rolling.ViewModels
 {
     public class RegisterViewModel : ObservableObject
     {
-        private const string FromPassword = "YOUR PASS";
+        private const string FromPassword = "YOUR_PASSWORD";
         private const string FromAddress = "YOUR_EMAIL@gmail.com";
         private string _verifyCode;
         
@@ -163,6 +163,14 @@ namespace Rolling.ViewModels
             {
                 if (_verifyCode == Code)
                 {
+                    var userData = new UserData
+                    {
+                        Email = Email
+                    };
+
+                    await UserDataStorage.SaveUserData(userData);
+                    _mainWindowViewModel.UserService.UpdateUserData();
+                    
                     var userModel = new UserModel
                     {
                         Name = Name,
