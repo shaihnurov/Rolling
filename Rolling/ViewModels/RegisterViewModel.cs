@@ -48,8 +48,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Register";
                     _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
                     _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.StatusInfoBar = 3;
                     
                     Task.Run(async() =>
@@ -76,8 +78,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Register";
                     _mainWindowViewModel.MessageInfoBar = "Please state your correct age";
                     _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.StatusInfoBar = 3;
                     
                     Task.Run(async() =>
@@ -148,7 +152,9 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Register";
                     _mainWindowViewModel.MessageInfoBar = "This mail is occupied by another user";
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.IsInfoBarVisible = true;
                     _mainWindowViewModel.StatusInfoBar = 3;
                 
@@ -184,7 +190,9 @@ namespace Rolling.ViewModels
 
                     _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                     _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
+                    _mainWindowViewModel.TitleTextInfoBar = "Register";
                     _mainWindowViewModel.MessageInfoBar = "Registration successfully completed";
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.IsInfoBarVisible = true;
                     _mainWindowViewModel.StatusInfoBar = 1;
                     
@@ -195,7 +203,9 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Register";
                     _mainWindowViewModel.MessageInfoBar = "You have entered an invalid code";
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.IsInfoBarVisible = true;
                     _mainWindowViewModel.StatusInfoBar = 3;
                 
@@ -239,8 +249,10 @@ namespace Rolling.ViewModels
             }
             catch (SmtpException ex)
             {
+                _mainWindowViewModel.TitleTextInfoBar = "Register";
                 _mainWindowViewModel!.MessageInfoBar = $"Error sending confirmation code to mail {email}";
                 _mainWindowViewModel.IsInfoBarVisible = true;
+                _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                 _mainWindowViewModel.StatusInfoBar = 3;
 
                 await Task.Delay(3000);
@@ -248,7 +260,9 @@ namespace Rolling.ViewModels
             }
             catch (Exception ex)
             {
+                _mainWindowViewModel.TitleTextInfoBar = "Register";
                 _mainWindowViewModel!.MessageInfoBar = $"There was an internal error";
+                _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                 _mainWindowViewModel.IsInfoBarVisible = true;
                 _mainWindowViewModel.StatusInfoBar = 3;
 

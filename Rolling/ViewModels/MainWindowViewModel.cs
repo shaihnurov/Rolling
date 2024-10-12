@@ -26,6 +26,7 @@ namespace Rolling.ViewModels
         }
         
         private bool _isInfoBarVisible = false;
+        private bool _isVisibleButtonInfoBar = false;
         private string _messageInfoBar;
         private string _titleTextInfoBar;
         private int _statusInfoBar;
@@ -37,6 +38,11 @@ namespace Rolling.ViewModels
         {
             get => _isInfoBarVisible;
             set => SetProperty(ref _isInfoBarVisible, value);
+        }
+        public bool IsVisibleButtonInfoBar
+        {
+            get => _isVisibleButtonInfoBar;
+            set => SetProperty(ref _isVisibleButtonInfoBar, value);
         }
         public string MessageInfoBar
         {
@@ -77,6 +83,7 @@ namespace Rolling.ViewModels
         public RelayCommand BtnRegOrAuthCommand { get; set; }
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
+        public AsyncRelayCommand TryAgainLocationCommand { get; set; }
 
         public MainWindowViewModel(IUserService userService)
         {

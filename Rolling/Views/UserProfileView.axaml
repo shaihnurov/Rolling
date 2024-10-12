@@ -12,46 +12,55 @@
         <vm:UserProfileViewModel/>
     </Design.DataContext>
     
-    <Border HorizontalAlignment="Center" VerticalAlignment="Center" >
-        <actipro:Card Title="{Binding UserName}" Description="{Binding UserEmail}"
-                      Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
-            <actipro:Card.Resources>
-                <actipro:ThicknessConverter x:Key="CoverPaddingConverter" Filter="Left,Top,Right" BaseThickness="0" />
-            </actipro:Card.Resources>
+    <Grid>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <actipro:Card Title="{Binding UserName}" Description="{Binding UserEmail}"
+                          Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
+                <actipro:Card.Resources>
+                    <actipro:ThicknessConverter x:Key="CoverPaddingConverter" Filter="Left,Top,Right" BaseThickness="0" />
+                </actipro:Card.Resources>
 
-            <actipro:Card.Cover>
-                <Border Margin="{Binding $parent[actipro:Card].Padding, Converter={StaticResource CoverPaddingConverter}}"
-                        CornerRadius="{actipro:ScaledCornerRadius 1}">
-                    <actipro:Avatar Height="{actipro:ScaledDouble '4+144'}"/>
-                </Border>
-            </actipro:Card.Cover>
+                <actipro:Card.Cover>
+                    <Border Margin="{Binding $parent[actipro:Card].Padding, Converter={StaticResource CoverPaddingConverter}}"
+                            CornerRadius="{actipro:ScaledCornerRadius 1}">
+                        <actipro:Avatar Height="{actipro:ScaledDouble '4+144'}"/>
+                    </Border>
+                </actipro:Card.Cover>
 
-            <StackPanel Orientation="Vertical">
-                <WrapPanel Orientation="Horizontal">
-                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
-                                   Text="Age "/>
-                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
-                                   Text="{Binding UserAge}"/>
+                <StackPanel Orientation="Vertical">
+                    <WrapPanel Orientation="Vertical" HorizontalAlignment="Left">
+                        <WrapPanel Orientation="Horizontal">
+                            <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                       Text="{Binding Address}"/>
+                        </WrapPanel>
+                        
+                        <WrapPanel Orientation="Horizontal" Margin="0 10 0 0">
+                            <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                       Text="Age "/>
+                            <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                       Text="{Binding UserAge}"/>
+                        </WrapPanel>
+                        
+                        <WrapPanel Orientation="Horizontal" Margin="0 3 0 0">
+                            <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
+                                       Text="Balance "/>
+                            <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
+                                <Run Text="0"/>
+                                <Run Text="$"/>
+                            </TextBlock>
+                        </WrapPanel>
                     </WrapPanel>
                     
-                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="50 0 0 0">
-                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
-                                   Text="Balance "/>
-                        <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
-                                   Text="0"/>
+                    <WrapPanel Orientation="Horizontal" Margin="0 20 0 0" HorizontalAlignment="Center">
+                        <Button Classes="theme-solid accent" Content="Load Avatar" Margin="0 0 5 0"
+                                FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
+                        <Button Classes="theme-solid accent" Content="Refill Balance" Margin="5 0 0 0"
+                                FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
                     </WrapPanel>
-                </WrapPanel>
-                
-                <WrapPanel Orientation="Horizontal" Margin="0 20 0 0">
-                    <Button Classes="theme-solid accent" Content="Load Avatar" Margin="0 0 5 0"
-                            FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
-                    <Button Classes="theme-solid accent" Content="Refill Balance" Margin="5 0 0 0"
-                            FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" />
-                </WrapPanel>
-                <Button Classes="theme-solid accent" Content="Exit Account" Margin="0 6 0 0"
-                        FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" Command="{Binding ExitAccountCommand}"/>
-            </StackPanel>
-        </actipro:Card>
-    </Border>
+                    <Button Classes="theme-solid accent" Content="Exit Account" Margin="0 6 0 0"
+                            FontSize="{actipro:ThemeResource DefaultFontSizeLarge}" Command="{Binding ExitAccountCommand}"/>
+                </StackPanel>
+            </actipro:Card>
+        </Border>
+    </Grid>
 </UserControl>

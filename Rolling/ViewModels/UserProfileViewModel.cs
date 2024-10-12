@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using ActiproSoftware.UI.Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,25 @@ public class UserProfileViewModel : ObservableObject
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly IUserService _userService;
+    private readonly GeoLocationService _geoLocationService;
+
+    private string _address;
+    private bool _isLoading;
 
     private string _userName;
     private string _userEmail;
     private string _userAge;
 
+    public string Address
+    {
+        get => _address;
+        set => SetProperty(ref _address, value);
+    }
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set => SetProperty(ref _isLoading, value);
+    }
     public string UserName
     {
         get => _userName;
@@ -38,14 +53,50 @@ public class UserProfileViewModel : ObservableObject
     public UserProfileViewModel(MainWindowViewModel mainWindowViewModel, IUserService userService)
     {
         _mainWindowViewModel = mainWindowViewModel;
+        _geoLocationService = new GeoLocationService();
         _userService = userService;
 
-        _userService.UserDataChanged += async () => await LoadDataUser();
-        Task.Run(async () => await LoadDataUser());
+        _mainWindowViewModel.TryAgainLocationCommand = new AsyncRelayCommand(GetLocation);
 
+        _userService.UserDataChanged += async () => await LoadDataUser();
+        Task.Run(async () => {
+            await LoadDataUser();
+            await GetLocation();
+        });
+        
         ExitAccountCommand = new AsyncRelayCommand(Exit);
     }
+    
+    private async Task GetLocation()
+    {
+        IsLoading = true;
+        var location = await _geoLocationService.GetLocation();
 
+        if (location != null)
+        {
+            Address = $"{location}";
+
+            var userData = await UserDataStorage.GetUserData();
+            if (userData != null)
+            {
+                userData.Location = location;
+                await UserDataStorage.SaveUserData(userData);
+            }
+            
+            _mainWindowViewModel.IsInfoBarVisible = false;
+            _mainWindowViewModel.IsVisibleButtonInfoBar = false;
+        }
+        else
+        {
+            _mainWindowViewModel.TitleTextInfoBar = "Location";
+            _mainWindowViewModel.MessageInfoBar = "Failed to get location";
+            _mainWindowViewModel.IsInfoBarVisible = true;
+            _mainWindowViewModel.IsVisibleButtonInfoBar = true;
+            _mainWindowViewModel.StatusInfoBar = 3;
+        }
+
+        IsLoading = false;
+    }
     private async Task Exit()
     {
         UserDataStorage.DeleteUserData();

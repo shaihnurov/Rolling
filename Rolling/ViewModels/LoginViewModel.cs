@@ -36,8 +36,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Auth";
                     _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
                     _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.StatusInfoBar = 3;
                     
                     Task.Run(async() =>
@@ -71,6 +73,7 @@ namespace Rolling.ViewModels
                     _mainWindowViewModel!.TitleTextInfoBar = "Auth";
                     _mainWindowViewModel!.MessageInfoBar = "Please fill in all available fields";
                     _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.StatusInfoBar = 2;
 
                     await Task.Delay(3000);
@@ -121,7 +124,9 @@ namespace Rolling.ViewModels
 
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                         _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
+                        _mainWindowViewModel.TitleTextInfoBar = "Auth";
                         _mainWindowViewModel.MessageInfoBar = "Successful entry";
+                        _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                         _mainWindowViewModel.IsInfoBarVisible = true;
                         _mainWindowViewModel.StatusInfoBar = 1;
                         
@@ -132,8 +137,10 @@ namespace Rolling.ViewModels
                     }
                     else
                     {
+                        _mainWindowViewModel.TitleTextInfoBar = "Auth";
                         _mainWindowViewModel.MessageInfoBar = "Incorrect data. Please check the correctness of the entered data";
                         _mainWindowViewModel.IsInfoBarVisible = true;
+                        _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                         _mainWindowViewModel.StatusInfoBar = 3;
                 
                         await Task.Delay(3000);
@@ -142,8 +149,10 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
+                    _mainWindowViewModel.TitleTextInfoBar = "Auth";
                     _mainWindowViewModel.MessageInfoBar = "User not found. If you think this is an error, please contact support";
                     _mainWindowViewModel.IsInfoBarVisible = true;
+                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
                     _mainWindowViewModel.StatusInfoBar = 3;
                 
                     await Task.Delay(3000);

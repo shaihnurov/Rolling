@@ -52,7 +52,7 @@
 						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
 						        ToolTip.Tip="Exit Account"/>
 						
-						<Button ContentTemplate="{actipro:GlyphTemplate Home16}"
+						<Button ContentTemplate="{actipro:GlyphTemplate Home16}" 
 						        Command="{Binding HomeViewCommand}"
 						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
 						        ToolTip.Tip="Home"/>
@@ -76,7 +76,12 @@
 			    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
 				    <actipro:InfoBar Severity="{Binding StatusInfoBar}" Title="{Binding TitleTextInfoBar}" IsVisible="{Binding IsInfoBarVisible}"
 				                     Message="{Binding MessageInfoBar}" HorizontalAlignment="Right" 
-				                     VerticalAlignment="Top" Margin="20" CanClose="False"/>        
+				                     VerticalAlignment="Top" Margin="20" CanClose="False">
+					    
+					    <actipro:InfoBar.Action>
+						    <Button HorizontalAlignment="Left" Command="{Binding TryAgainLocationCommand}" IsVisible="{Binding IsVisibleButtonInfoBar}">Try again</Button>
+					    </actipro:InfoBar.Action>
+				    </actipro:InfoBar>        
 			    </StackPanel>
 
 			    <Grid.RowDefinitions>
