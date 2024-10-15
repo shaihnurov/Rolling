@@ -1,6 +1,8 @@
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using ActiproSoftware.UI.Avalonia.Controls;
+using Avalonia.Animation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,7 @@ public class UserProfileViewModel : ObservableObject
     private string _userName;
     private string _userEmail;
     private string _userAge;
+    private int _userLevel;
 
     public string Address
     {
@@ -47,8 +50,13 @@ public class UserProfileViewModel : ObservableObject
         get => _userAge;
         set => SetProperty(ref _userAge, value);
     }
+    public int UserLevel
+    {
+        get => _userLevel;
+        set => SetProperty(ref _userLevel, value);
+    }
 
-    public AsyncRelayCommand ExitAccountCommand { get; set; }
+    public RelayCommand ExitAccountCommand { get; set; }
     
     public UserProfileViewModel(MainWindowViewModel mainWindowViewModel, IUserService userService)
     {
@@ -64,7 +72,7 @@ public class UserProfileViewModel : ObservableObject
             await GetLocation();
         });
         
-        ExitAccountCommand = new AsyncRelayCommand(Exit);
+        ExitAccountCommand = new RelayCommand(Exit);
     }
     
     private async Task GetLocation()
@@ -97,7 +105,7 @@ public class UserProfileViewModel : ObservableObject
 
         IsLoading = false;
     }
-    private async Task Exit()
+    private void Exit()
     {
         UserDataStorage.DeleteUserData();
         _mainWindowViewModel.TitleText = "Auth";
@@ -117,6 +125,7 @@ public class UserProfileViewModel : ObservableObject
                 UserName = item.Name;
                 UserEmail = item.Email;
                 UserAge = item.Age.ToString();
+                UserLevel = item.Level;
             }
         }
     }

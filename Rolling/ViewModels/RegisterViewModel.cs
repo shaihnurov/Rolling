@@ -15,8 +15,8 @@ namespace Rolling.ViewModels
 {
     public class RegisterViewModel : ObservableObject
     {
-        private const string FromPassword = "YOUR_PASSWORD";
-        private const string FromAddress = "YOUR_EMAIL@gmail.com";
+        private const string FromPassword = "uvos umpw nqqh lxpk";
+        private const string FromAddress = "shaihnurov3@gmail.com";
         private string _verifyCode;
         
         private string _name;
@@ -182,7 +182,9 @@ namespace Rolling.ViewModels
                         Name = Name,
                         Age = int.Parse(Age),
                         Email = Email,
-                        Password = BCrypt.Net.BCrypt.HashPassword(Password)
+                        Password = BCrypt.Net.BCrypt.HashPassword(Password),
+                        Level = 1,
+                        Permission = "User"
                     };
                 
                     await db.UserModels.AddAsync(userModel);
@@ -247,7 +249,7 @@ namespace Rolling.ViewModels
                 };
                 smtp.Send(message);
             }
-            catch (SmtpException ex)
+            catch (SmtpException)
             {
                 _mainWindowViewModel.TitleTextInfoBar = "Register";
                 _mainWindowViewModel!.MessageInfoBar = $"Error sending confirmation code to mail {email}";
@@ -258,7 +260,7 @@ namespace Rolling.ViewModels
                 await Task.Delay(3000);
                 _mainWindowViewModel.IsInfoBarVisible = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _mainWindowViewModel.TitleTextInfoBar = "Register";
                 _mainWindowViewModel!.MessageInfoBar = $"There was an internal error";

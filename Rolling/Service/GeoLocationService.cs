@@ -19,7 +19,7 @@ public class GeoLocationService
 
     public async Task<string> GetLocation()
     {
-        var userData = await UserDataStorage.GetUserData();
+        UserData userData = await UserDataStorage.GetUserData();
         if(userData.Location == null)
         {
             using var httpClient = new HttpClient
@@ -45,21 +45,21 @@ public class GeoLocationService
                     return location;
                 }
 
-                MessageBox.Show("Не удалось получить местоположение.");
+                await MessageBox.Show("Не удалось получить местоположение.");
             }
             catch (HttpRequestException ex)
             {
-                MessageBox.Show($"Ошибка запроса: {ex.Message}");
+                await MessageBox.Show($"Ошибка запроса: {ex.Message}");
             }
             catch (TaskCanceledException)
             {
-                MessageBox.Show("Превышено время ожидания запроса.");
+                await MessageBox.Show("Превышено время ожидания запроса.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Неожиданная ошибка: {ex.Message}");
+                await MessageBox.Show($"Неожиданная ошибка: {ex.Message}");
             }
         }
-        return userData.Location;
+        return userData.Location!;
     }
 }

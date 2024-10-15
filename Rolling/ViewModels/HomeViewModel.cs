@@ -4,5 +4,8 @@ namespace Rolling.ViewModels;
 
 public class HomeViewModel : ObservableObject
 {
-    
+    public HomeViewModel()
+    {
+
+    }
 }

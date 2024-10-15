@@ -12,8 +12,13 @@
         <vm:UserProfileViewModel/>
     </Design.DataContext>
     
-    <Grid>
-        <Border HorizontalAlignment="Center" VerticalAlignment="Center" >
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <Border Grid.Column="0">
             <actipro:Card Title="{Binding UserName}" Description="{Binding UserEmail}"
                           Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
                 <actipro:Card.Resources>
@@ -23,7 +28,16 @@
                 <actipro:Card.Cover>
                     <Border Margin="{Binding $parent[actipro:Card].Padding, Converter={StaticResource CoverPaddingConverter}}"
                             CornerRadius="{actipro:ScaledCornerRadius 1}">
-                        <actipro:Avatar Height="{actipro:ScaledDouble '4+144'}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <actipro:Avatar Height="{actipro:ScaledDouble '4+144'}" HorizontalAlignment="Center"/>
+                        
+                            <actipro:CircularProgressBar Width="80" Height="80" ProgressTextFormat="{}Level {0:0}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                         LineThickness="6" LineDashArray="4" Margin="15 0 0 0"
+                                                         FontSize="18" FontWeight="Thin" Maximum="5" Minimum="1"
+                                                         TrackBrush="{actipro:ThemeResource ControlBackgroundBrushSoftDangerPointerOver}"
+                                                         IndicatorBrush="{actipro:ThemeResource ControlBackgroundBrushSolidDanger}"
+                                                         Value="{Binding UserLevel}"/>
+                        </StackPanel>
                     </Border>
                 </actipro:Card.Cover>
 

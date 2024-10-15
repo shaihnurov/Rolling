@@ -47,10 +47,20 @@
 			<actipro:ChromedTitleBar.RightContent>
 				<primitives:OverlayInputFilter>
 					<StackPanel Margin="{Binding $parent[actipro:ChromedTitleBar].HasCaptionButtons, Converter={StaticResource RightContentMarginConverter}}" Orientation="Horizontal">
+						<Button ContentTemplate="{actipro:GlyphTemplate Error16}"
+						        Command="{Binding AdminViewCommand}"
+						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleButtonAdmin}"
+						        ToolTip.Tip="Admin Page"/>
+						
+						<Button ContentTemplate="{actipro:GlyphTemplate Options16}"
+						        Command="{Binding}"
+						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
+						        ToolTip.Tip="Options"/>
+						
 						<Button ContentTemplate="{actipro:GlyphTemplate Avatar16}"
 						        Command="{Binding UserProfileCommand}"
 						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleBtnUserAcc}"
-						        ToolTip.Tip="Exit Account"/>
+						        ToolTip.Tip="Account"/>
 						
 						<Button ContentTemplate="{actipro:GlyphTemplate Home16}" 
 						        Command="{Binding HomeViewCommand}"
@@ -73,7 +83,7 @@
 		    <Grid>
 			    <actipro:WindowResizeGrip/>
 			    
-			    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+			    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" ZIndex="99">
 				    <actipro:InfoBar Severity="{Binding StatusInfoBar}" Title="{Binding TitleTextInfoBar}" IsVisible="{Binding IsInfoBarVisible}"
 				                     Message="{Binding MessageInfoBar}" HorizontalAlignment="Right" 
 				                     VerticalAlignment="Top" Margin="20" CanClose="False">

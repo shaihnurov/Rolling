@@ -63,6 +63,8 @@ namespace Rolling.ViewModels
         
         public LoginViewModel(MainWindowViewModel mainWindowViewModel)
         {
+            _mainWindowViewModel = mainWindowViewModel;
+            
             RegisterUserCommand = new AsyncRelayCommand(async() => {
                 if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password))
                 {
@@ -80,8 +82,6 @@ namespace Rolling.ViewModels
                     _mainWindowViewModel.IsInfoBarVisible = false;
                 }
             });
-
-            _mainWindowViewModel = mainWindowViewModel;
         }
         
         private async Task AuthUser()
@@ -99,7 +99,7 @@ namespace Rolling.ViewModels
 
                     if (_resultAuth)
                     {
-                        if (IsCheckedSaveData == true)
+                        if (IsCheckedSaveData)
                         {
                             string token = TokenService.GenerateToken(Email);
                             var userData = new UserData
@@ -120,6 +120,14 @@ namespace Rolling.ViewModels
 
                             await UserDataStorage.SaveUserData(userData);
                         }
+
+                        bool permission = await _mainWindowViewModel.CheckUserPermission(Email);
+                        
+                        if(permission)
+                            _mainWindowViewModel.IsVisibleButtonAdmin = false;
+                        else
+                            _mainWindowViewModel.IsVisibleButtonAdmin = true;
+                        
                         _mainWindowViewModel.UserService.UpdateUserData();
 
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;

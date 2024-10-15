@@ -1,5 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using Rolling.Models;
 using Rolling.Service;
 
@@ -27,10 +31,11 @@ namespace Rolling.ViewModels
         
         private bool _isInfoBarVisible = false;
         private bool _isVisibleButtonInfoBar = false;
+        private bool _isVisibleButtonAdmin = false;
         private string _messageInfoBar;
         private string _titleTextInfoBar;
         private int _statusInfoBar;
-        private bool _isVisibleBtnAuthOrReg = true;
+        private bool _isVisibleBtnAuthOrReg;
         private bool _isVisibleBtnUserAcc;
         private string _titleText;
         
@@ -43,6 +48,11 @@ namespace Rolling.ViewModels
         {
             get => _isVisibleButtonInfoBar;
             set => SetProperty(ref _isVisibleButtonInfoBar, value);
+        }
+        public bool IsVisibleButtonAdmin
+        {
+            get => _isVisibleButtonAdmin;
+            set => SetProperty(ref _isVisibleButtonAdmin, value);
         }
         public string MessageInfoBar
         {
@@ -79,11 +89,13 @@ namespace Rolling.ViewModels
         private LoginViewModel LoginViewModel { get; set; }
         private HomeViewModel HomeViewModel { get; set; }
         private UserProfileViewModel UserProfileViewModel { get; set; }
+        private AdminViewModel AdminViewModel { get; set; }
         
         public RelayCommand BtnRegOrAuthCommand { get; set; }
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
         public AsyncRelayCommand TryAgainLocationCommand { get; set; }
+        public AsyncRelayCommand AdminViewCommand { get; set; }
 
         public MainWindowViewModel(IUserService userService)
         {
@@ -97,9 +109,8 @@ namespace Rolling.ViewModels
             LoginViewModel = new LoginViewModel(this);
             HomeViewModel = new HomeViewModel();
             UserProfileViewModel = new UserProfileViewModel(this, _userService);
-
-            CurrentView = LoginViewModel;
-
+            AdminViewModel = new AdminViewModel();
+            
             BtnRegOrAuthCommand = new RelayCommand(() => {
                 if (_state == 0)
                 {
@@ -118,8 +129,29 @@ namespace Rolling.ViewModels
                 TitleText = "Home";
             });
             UserProfileCommand = new RelayCommand(() => {
+                UserService.UpdateUserData();
                 CurrentView = UserProfileViewModel;
                 TitleText = "Profile";
+            });
+            AdminViewCommand = new AsyncRelayCommand(async() => {
+                UserData email = await UserDataStorage.GetUserData();
+                bool permission = await CheckUserPermission(email.Email);
+                if(!permission)
+                {
+                    CurrentView = AdminViewModel;
+                    TitleText = "Admin Controls";
+                }
+                else
+                {
+                    IsVisibleButtonAdmin = false;
+                    TitleTextInfoBar = "Permission";
+                    MessageInfoBar = "Access denied";
+                    IsInfoBarVisible = true;
+                    IsVisibleButtonInfoBar = false;
+                    StatusInfoBar = 3;
+                    await Task.Delay(3000);
+                    IsInfoBarVisible = false;
+                }
             });
         }
 
@@ -127,16 +159,23 @@ namespace Rolling.ViewModels
         {
             UserData storedUserData = await UserDataStorage.GetUserData();
 
-            if (storedUserData != null && !string.IsNullOrEmpty(storedUserData.Token))
+            if (storedUserData != null && !string.IsNullOrEmpty(storedUserData!.Token))
             {
                 var claimsPrincipal = TokenService.ValidateToken(storedUserData.Token);
 
                 if (claimsPrincipal != null)
                 {
+                    bool result = await CheckUserPermission(storedUserData.Email);
+                    
                     IsVisibleBtnUserAcc = true;
                     IsVisibleBtnAuthOrReg = false;
                     CurrentView = HomeViewModel;
                     TitleText = "Home";
+                    
+                    if(result)
+                        IsVisibleButtonAdmin = false;
+                    else
+                        IsVisibleButtonAdmin = true;
                 }
                 else
                 {
@@ -148,10 +187,22 @@ namespace Rolling.ViewModels
             }
             else
             {
+                await Task.Delay(1);
                 IsVisibleBtnUserAcc = false;
                 IsVisibleBtnAuthOrReg = true;
                 CurrentView = LoginViewModel;
             }
+        }
+        public async Task<bool> CheckUserPermission(string email)
+        {
+            using (ApplicationContextDb db = new())
+            {
+                var user = await db.UserModels.FirstOrDefaultAsync(x => x.Email == email);
+
+                if (user != null && user.Permission == "User")
+                    return true;
+            }
+            return false;
         }
     }
 }

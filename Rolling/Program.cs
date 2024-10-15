@@ -17,5 +17,7 @@ sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace();
+            .LogToTrace()
+            .RegisterActiproLicense("Future Actipro Customer",
+                "AVA242-AVYDT-FBHLB-W5V64-4V3H");
 }
