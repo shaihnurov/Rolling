@@ -96,11 +96,7 @@ public class UserProfileViewModel : ObservableObject
         }
         else
         {
-            _mainWindowViewModel.TitleTextInfoBar = "Location";
-            _mainWindowViewModel.MessageInfoBar = "Failed to get location";
-            _mainWindowViewModel.IsInfoBarVisible = true;
-            _mainWindowViewModel.IsVisibleButtonInfoBar = true;
-            _mainWindowViewModel.StatusInfoBar = 3;
+            _mainWindowViewModel.Notification("Location", "Failed to get location", true, true, 3, false);
         }
 
         IsLoading = false;
@@ -115,7 +111,7 @@ public class UserProfileViewModel : ObservableObject
     }
     private async Task LoadDataUser()
     {
-        using (ApplicationContextDb db = new()) 
+        /*using (ApplicationContextDb db = new()) 
         {
             UserData userData = await UserDataStorage.GetUserData();
             var user = await db.UserModels.Where(s => s.Email == userData.Email).ToListAsync();
@@ -127,6 +123,6 @@ public class UserProfileViewModel : ObservableObject
                 UserAge = item.Age.ToString();
                 UserLevel = item.Level;
             }
-        }
+        }*/
     }
 }

@@ -36,17 +36,7 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Auth";
-                    _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                    
-                    Task.Run(async() =>
-                    {
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;
-                    });
+                    _mainWindowViewModel.Notification("Auth", "Please state your correct email", true, false, 3, true);
                 }
             }
         }
@@ -72,21 +62,14 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel!.TitleTextInfoBar = "Auth";
-                    _mainWindowViewModel!.MessageInfoBar = "Please fill in all available fields";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.StatusInfoBar = 2;
-
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;
+                    _mainWindowViewModel.Notification("Auth", "Please fill in all available fields", true, false, 2, true);
                 }
             });
         }
         
         private async Task AuthUser()
         { 
-            using (ApplicationContextDb db = new())
+            /*using (ApplicationContextDb db = new())
             {
                 var currentUser = await db.UserModels.AsNoTracking().Where(s => s.Email == Email).ToListAsync();
 
@@ -132,41 +115,24 @@ namespace Rolling.ViewModels
 
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                         _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
-                        _mainWindowViewModel.TitleTextInfoBar = "Auth";
-                        _mainWindowViewModel.MessageInfoBar = "Successful entry";
-                        _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                        _mainWindowViewModel.IsInfoBarVisible = true;
-                        _mainWindowViewModel.StatusInfoBar = 1;
                         
-                        _mainWindowViewModel.CurrentView = new HomeViewModel();
+                        _mainWindowViewModel.Notification("Auth", "Successful entry", true, false, 1, true);
+                        
+                        _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
                 
                         await Task.Delay(3000);
                         _mainWindowViewModel.IsInfoBarVisible = false;
                     }
                     else
                     {
-                        _mainWindowViewModel.TitleTextInfoBar = "Auth";
-                        _mainWindowViewModel.MessageInfoBar = "Incorrect data. Please check the correctness of the entered data";
-                        _mainWindowViewModel.IsInfoBarVisible = true;
-                        _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                        _mainWindowViewModel.StatusInfoBar = 3;
-                
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;
+                        _mainWindowViewModel.Notification("Auth", "Incorrect data. Please check the correctness of the entered data", true, false, 3, true);
                     }
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Auth";
-                    _mainWindowViewModel.MessageInfoBar = "User not found. If you think this is an error, please contact support";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;
+                    _mainWindowViewModel.Notification("Auth", "User not found. If you think this is an error, please contact support", true, false, 3, true);
                 }
-            }
+            }*/
         }
         private bool IsValidEmail(string email)
         {

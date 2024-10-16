@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Chrome;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +23,14 @@ namespace Rolling.ViewModels
         public object CurrentView
         {
             get => _currentView;
-            set => SetProperty(ref _currentView, value);
+            set
+            {
+                /*if (_currentView is IClosableConnection closable)
+                {
+                    closable.CloseConnectionAsync();
+                }*/
+                SetProperty(ref _currentView, value);
+            }
         }
         public string BtnRegOrAuthText
         {
@@ -107,9 +116,9 @@ namespace Rolling.ViewModels
             
             RegisterViewModel = new RegisterViewModel(this);
             LoginViewModel = new LoginViewModel(this);
-            HomeViewModel = new HomeViewModel();
+            HomeViewModel = new HomeViewModel(this);
             UserProfileViewModel = new UserProfileViewModel(this, _userService);
-            AdminViewModel = new AdminViewModel();
+            AdminViewModel = new AdminViewModel(this);
             
             BtnRegOrAuthCommand = new RelayCommand(() => {
                 if (_state == 0)
@@ -195,14 +204,28 @@ namespace Rolling.ViewModels
         }
         public async Task<bool> CheckUserPermission(string email)
         {
-            using (ApplicationContextDb db = new())
+            /*using (ApplicationContextDb db = new())
             {
                 var user = await db.UserModels.FirstOrDefaultAsync(x => x.Email == email);
 
                 if (user != null && user.Permission == "User")
                     return true;
-            }
+            }*/
             return false;
+        }
+        public async void Notification(string title, string message, bool visibleInfoBar, bool visibleBtnInfoBar, int statusCode, bool timeLife)
+        {
+            TitleTextInfoBar = title;
+            MessageInfoBar = message;
+            IsVisibleButtonInfoBar = visibleBtnInfoBar;
+            IsInfoBarVisible = visibleInfoBar;
+            StatusInfoBar = statusCode;
+
+            if (timeLife)
+            {
+                await Task.Delay(3000);
+                IsInfoBarVisible = false;
+            }
         }
     }
 }

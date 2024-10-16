@@ -48,17 +48,7 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel.MessageInfoBar = "Please state your correct email";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                    
-                    Task.Run(async() =>
-                    {
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;
-                    });
+                    _mainWindowViewModel.Notification("Register", "Please state your correct email", true, false, 3, true);
                 }
             }
         }
@@ -78,17 +68,7 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel.MessageInfoBar = "Please state your correct age";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                    
-                    Task.Run(async() =>
-                    {
-                        await Task.Delay(3000);
-                        _mainWindowViewModel.IsInfoBarVisible = false;
-                    });
+                    _mainWindowViewModel.Notification("Register", "Please state your correct age", true, false, 3, true);
                 }
             }
         }
@@ -115,6 +95,8 @@ namespace Rolling.ViewModels
         
         public RegisterViewModel(MainWindowViewModel mainWindowViewModel)
         {
+            _mainWindowViewModel = mainWindowViewModel;
+            
             RegisterUserCommand = new AsyncRelayCommand(async() => {
                 if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Age) && !string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password))
                 {
@@ -122,23 +104,15 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel!.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel!.MessageInfoBar = "Please fill in all available fields";
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 2;
-
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;
+                    _mainWindowViewModel.Notification("Register", "Please fill in all available fields", true, false, 2, true);
                 }
             });
             ConfirmCodeRegCommand = new AsyncRelayCommand(RegisterUser);
-
-            _mainWindowViewModel = mainWindowViewModel;
         }
 
         private async Task BtnSendCodeUser()
         {
-            using (ApplicationContextDb db = new())
+            /*using (ApplicationContextDb db = new())
             {
                 var uniqueEmail = await db.UserModels.Where(s => s.Email == Email).ToListAsync();
 
@@ -152,20 +126,13 @@ namespace Rolling.ViewModels
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel.MessageInfoBar = "This mail is occupied by another user";
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;
+                    _mainWindowViewModel.Notification("Register", "This mail is occupied by another user", true, false, 3, true);
                 }
-            }
+            }*/
         }
         private async Task RegisterUser()
         {
-            using (ApplicationContextDb db = new())
+            /*using (ApplicationContextDb db = new())
             {
                 if (_verifyCode == Code)
                 {
@@ -192,29 +159,16 @@ namespace Rolling.ViewModels
 
                     _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                     _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
-                    _mainWindowViewModel.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel.MessageInfoBar = "Registration successfully completed";
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 1;
                     
-                    _mainWindowViewModel.CurrentView = new HomeViewModel();
-                
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;   
+                    _mainWindowViewModel.Notification("Register", "Registration successfully completed", true, false, 1, true);
+                    
+                    _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
                 }
                 else
                 {
-                    _mainWindowViewModel.TitleTextInfoBar = "Register";
-                    _mainWindowViewModel.MessageInfoBar = "You have entered an invalid code";
-                    _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                    _mainWindowViewModel.IsInfoBarVisible = true;
-                    _mainWindowViewModel.StatusInfoBar = 3;
-                
-                    await Task.Delay(3000);
-                    _mainWindowViewModel.IsInfoBarVisible = false;
+                    _mainWindowViewModel.Notification("Register", "You have entered an invalid code", true, false, 3, true);
                 }
-            }
+            }*/
         }
         private string GenerateCode()
         {
@@ -251,25 +205,11 @@ namespace Rolling.ViewModels
             }
             catch (SmtpException)
             {
-                _mainWindowViewModel.TitleTextInfoBar = "Register";
-                _mainWindowViewModel!.MessageInfoBar = $"Error sending confirmation code to mail {email}";
-                _mainWindowViewModel.IsInfoBarVisible = true;
-                _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                _mainWindowViewModel.StatusInfoBar = 3;
-
-                await Task.Delay(3000);
-                _mainWindowViewModel.IsInfoBarVisible = false;
+                _mainWindowViewModel.Notification("Register", $"Error sending confirmation code to mail {email}", true, false, 3, true);
             }
             catch (Exception)
             {
-                _mainWindowViewModel.TitleTextInfoBar = "Register";
-                _mainWindowViewModel!.MessageInfoBar = $"There was an internal error";
-                _mainWindowViewModel.IsVisibleButtonInfoBar = false;
-                _mainWindowViewModel.IsInfoBarVisible = true;
-                _mainWindowViewModel.StatusInfoBar = 3;
-
-                await Task.Delay(3000);
-                _mainWindowViewModel.IsInfoBarVisible = false;
+                _mainWindowViewModel.Notification("Register", "There was an internal error", true, false, 3, true);
             }
         }
         private bool IsNumeric(string age)

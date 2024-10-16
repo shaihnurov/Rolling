@@ -6,11 +6,10 @@ public class ApplicationContextDb : DbContext
 {
     public DbSet<UserModel> UserModels => Set<UserModel>();
     public DbSet<CarsRentalModel> CarsRentalModels => Set<CarsRentalModel>();
-
-    public ApplicationContextDb() => Database.EnsureCreated();
-
-    protected override void OnConfiguring(DbContextOptionsBuilder builder)
+    
+    public ApplicationContextDb(DbContextOptions<ApplicationContextDb> options) : base(options)
     {
-        builder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;DataBase=BaseRolling;Trusted_Connection=True;");
+        // Удаляем EnsureCreated, если планируете использовать миграции
+        // Database.EnsureCreated(); // Используйте только если не планируете миграции
     }
 }

@@ -1,14 +1,23 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Rolling.Models;
+using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
-    public class AdminViewModel : ObservableObject
+    public class AdminViewModel : ObservableObject, IClosableConnection
     {
+        private HubConnection _connection;
+        private readonly MainWindowViewModel _mainWindowViewModel;
         private ObservableCollection<CarsRentalModel> _carsRental;
 
         public ObservableCollection<CarsRentalModel> CarsRental
@@ -19,56 +28,63 @@ namespace Rolling.ViewModels
 
         public AsyncRelayCommand BtnSaveChangedCommand { get; set; }
         
-        public AdminViewModel()
+        public AdminViewModel(MainWindowViewModel mainWindowViewModel)
         {
+            _mainWindowViewModel = mainWindowViewModel;
+            
             CarsRental = new ObservableCollection<CarsRentalModel>();
-            LoadCollectionCars();
+            InitializeConnection();
             BtnSaveChangedCommand = new AsyncRelayCommand(SaveChanges);
         }
 
-        private void LoadCollectionCars()
+        private async void InitializeConnection()
         {
-            Task.Run(async () =>
+            try
             {
-                using (ApplicationContextDb db = new())
-                {
-                    var cars = await db.CarsRentalModels.ToListAsync();
+                _connection = new HubConnectionBuilder().WithUrl("https://localhost:7160/carhub").Build();
 
-                    foreach (var item in cars)
+                _connection.On<ObservableCollection<CarsRentalModel>>("ReceiveCars", cars =>
+                {
+                    Dispatcher.UIThread.Invoke(() =>
                     {
-                        CarsRental.Add(item);
-                    }
-                }
-            });
+                        CarsRental.Clear();
+                        foreach (var car in cars)
+                        {
+                            CarsRental.Add(car);
+                        }
+                    });
+                });
+
+                await _connection.StartAsync();
+                await LoadCars();
+            }
+            catch (HttpRequestException ex)
+            {
+                _mainWindowViewModel.Notification("Server Error", $"{ex.StatusCode} {ex.Message}", true, false, 3, true);
+            }
+            catch (SocketException ex)
+            {
+                _mainWindowViewModel.Notification("Server Error(socket)", $"{ex.SocketErrorCode} {ex.Message}", true, false, 3, true);
+            }
+        }
+        private async Task LoadCars()
+        {
+            await _connection.InvokeAsync("GetCars");
+
         }
         private async Task SaveChanges()
         {
             if (CarsRental.Count != 0)
             {
-                using (ApplicationContextDb db = new())
-                {
-                    foreach (var carsModel in CarsRental)
-                    {
-                        var existingCar = await db.CarsRentalModels.FirstOrDefaultAsync(s => s.Id == carsModel.Id);
-
-                        if (existingCar != null)
-                        {
-                            existingCar.Mark = carsModel.Mark;
-                            existingCar.Model = carsModel.Model;
-                            existingCar.Year = carsModel.Year;
-                            existingCar.Color = carsModel.Color;
-                            existingCar.HorsePower = carsModel.HorsePower;
-                            existingCar.Mileage = carsModel.Mileage;
-                            existingCar.Engine = carsModel.Engine;
-                            existingCar.Price = carsModel.Price;
-                            existingCar.Status = carsModel.Status;
-                            
-                            db.Entry(existingCar).State = EntityState.Modified;
-                        }
-                    }
-
-                    await db.SaveChangesAsync();
-                }
+                await _connection.InvokeAsync("SaveChangesCars", CarsRental);
+            }
+        }
+        public async Task CloseConnectionAsync()
+        {
+            if (_connection != null && _connection.State == HubConnectionState.Connected)
+            {
+                await _connection.StopAsync();
+                await _connection.DisposeAsync();
             }
         }
     }

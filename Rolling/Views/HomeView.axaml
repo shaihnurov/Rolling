@@ -54,7 +54,7 @@
             </Panel>
         </WrapPanel>
         
-        <Grid Grid.Row="1" Margin="50">
+        <Grid Grid.Row="1" Margin="50" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -64,10 +64,17 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <Border Grid.Column="0" Background="{actipro:ThemeResource Container3BackgroundBrush}" Height="230"
-                    Width="200" CornerRadius="10" BorderBrush="{actipro:ThemeResource Container3BorderBrush}"
+            <Border Grid.Column="0" Background="{actipro:ThemeResource Container3BackgroundBrush}" MinHeight="230"
+                    MinWidth="200" CornerRadius="10" BorderBrush="{actipro:ThemeResource Container3BorderBrush}"
                     BorderThickness="2">
-                
+                  <WrapPanel Margin="4" Orientation="Vertical" HorizontalAlignment="Center">
+                      <Label Content="Введите логин"/>
+                      <TextBox Text="{Binding Login}" />
+                      <Label Content="Введите сообщение"/>
+                      <TextBox Text="{Binding Message}" />
+                      <Button Command="{Binding SendCommand}" Content="Отправить"/>
+                      <ListBox ItemsSource="{Binding ChatBox}"/>
+                  </WrapPanel>
             </Border>
         </Grid>
     </Grid>
