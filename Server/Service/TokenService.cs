@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Rolling.Models;
+namespace Server.Service;
 
 public class TokenService
 {

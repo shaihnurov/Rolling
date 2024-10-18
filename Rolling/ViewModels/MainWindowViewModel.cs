@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
-using Avalonia.Controls.Chrome;
-using Avalonia.Controls.Notifications;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR.Client;
 using Rolling.Models;
 using Rolling.Service;
+using Rolling.Views;
 
 namespace Rolling.ViewModels
 {
     public class MainWindowViewModel : ObservableObject
     {
-        private readonly IUserService _userService;
-        public IUserService UserService => _userService;
-        
         private int _state = 0;
         private object _currentView;
         private string _btnRegOrAuthText;
@@ -25,11 +24,17 @@ namespace Rolling.ViewModels
             get => _currentView;
             set
             {
-                /*if (_currentView is IClosableConnection closable)
+                if (_currentView is IServerConnectionHandler currentServerConnectionHandler)
                 {
-                    closable.CloseConnectionAsync();
-                }*/
+                    currentServerConnectionHandler.StopConnection();
+                }
+                
                 SetProperty(ref _currentView, value);
+                
+                if (_currentView is IServerConnectionHandler newServerConnectionHandler)
+                {
+                    newServerConnectionHandler.ConnectToSignalR();
+                }
             }
         }
         public string BtnRegOrAuthText
@@ -104,20 +109,17 @@ namespace Rolling.ViewModels
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
         public AsyncRelayCommand TryAgainLocationCommand { get; set; }
-        public AsyncRelayCommand AdminViewCommand { get; set; }
-
-        public MainWindowViewModel(IUserService userService)
+        public RelayCommand AdminViewCommand { get; set; }
+        
+        public MainWindowViewModel()
         {
-            _userService = userService;
-            CheckUserToken();
-            
             BtnRegOrAuthText = "Do you have an account yet?";
             TitleText = "Procces Authentication";
             
             RegisterViewModel = new RegisterViewModel(this);
             LoginViewModel = new LoginViewModel(this);
             HomeViewModel = new HomeViewModel(this);
-            UserProfileViewModel = new UserProfileViewModel(this, _userService);
+            UserProfileViewModel = new UserProfileViewModel(this);
             AdminViewModel = new AdminViewModel(this);
             
             BtnRegOrAuthCommand = new RelayCommand(() => {
@@ -138,81 +140,18 @@ namespace Rolling.ViewModels
                 TitleText = "Home";
             });
             UserProfileCommand = new RelayCommand(() => {
-                UserService.UpdateUserData();
                 CurrentView = UserProfileViewModel;
                 TitleText = "Profile";
             });
-            AdminViewCommand = new AsyncRelayCommand(async() => {
-                UserData email = await UserDataStorage.GetUserData();
-                bool permission = await CheckUserPermission(email.Email);
-                if(!permission)
-                {
-                    CurrentView = AdminViewModel;
-                    TitleText = "Admin Controls";
-                }
-                else
-                {
-                    IsVisibleButtonAdmin = false;
-                    TitleTextInfoBar = "Permission";
-                    MessageInfoBar = "Access denied";
-                    IsInfoBarVisible = true;
-                    IsVisibleButtonInfoBar = false;
-                    StatusInfoBar = 3;
-                    await Task.Delay(3000);
-                    IsInfoBarVisible = false;
-                }
+            AdminViewCommand = new RelayCommand(() => {
+                CurrentView = AdminViewModel;
+                TitleText = "Admin Controls";
             });
+            
+            CurrentView = LoginViewModel;
+            IsVisibleBtnAuthOrReg = true;
         }
-
-        private async void CheckUserToken()
-        {
-            UserData storedUserData = await UserDataStorage.GetUserData();
-
-            if (storedUserData != null && !string.IsNullOrEmpty(storedUserData!.Token))
-            {
-                var claimsPrincipal = TokenService.ValidateToken(storedUserData.Token);
-
-                if (claimsPrincipal != null)
-                {
-                    bool result = await CheckUserPermission(storedUserData.Email);
-                    
-                    IsVisibleBtnUserAcc = true;
-                    IsVisibleBtnAuthOrReg = false;
-                    CurrentView = HomeViewModel;
-                    TitleText = "Home";
-                    
-                    if(result)
-                        IsVisibleButtonAdmin = false;
-                    else
-                        IsVisibleButtonAdmin = true;
-                }
-                else
-                {
-                    UserDataStorage.DeleteUserData();
-                    IsVisibleBtnUserAcc = false;
-                    IsVisibleBtnAuthOrReg = true;
-                    CurrentView = LoginViewModel;
-                }
-            }
-            else
-            {
-                await Task.Delay(1);
-                IsVisibleBtnUserAcc = false;
-                IsVisibleBtnAuthOrReg = true;
-                CurrentView = LoginViewModel;
-            }
-        }
-        public async Task<bool> CheckUserPermission(string email)
-        {
-            /*using (ApplicationContextDb db = new())
-            {
-                var user = await db.UserModels.FirstOrDefaultAsync(x => x.Email == email);
-
-                if (user != null && user.Permission == "User")
-                    return true;
-            }*/
-            return false;
-        }
+        
         public async void Notification(string title, string message, bool visibleInfoBar, bool visibleBtnInfoBar, int statusCode, bool timeLife)
         {
             TitleTextInfoBar = title;

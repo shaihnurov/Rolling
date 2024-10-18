@@ -1,22 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net.Http;
-using System.Net.Sockets;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.EntityFrameworkCore;
 using Rolling.Models;
 using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
-    public class AdminViewModel : ObservableObject, IClosableConnection
+    public class AdminViewModel : ObservableObject, IServerConnectionHandler
     {
-        private HubConnection _connection;
+        private HubConnection _hubConnection;
         private readonly MainWindowViewModel _mainWindowViewModel;
         private ObservableCollection<CarsRentalModel> _carsRental;
 
@@ -25,27 +22,62 @@ namespace Rolling.ViewModels
             get => _carsRental;
             set => SetProperty(ref _carsRental, value);
         }
-
         public AsyncRelayCommand BtnSaveChangedCommand { get; set; }
-        
+
         public AdminViewModel(MainWindowViewModel mainWindowViewModel)
         {
             _mainWindowViewModel = mainWindowViewModel;
-            
-            CarsRental = new ObservableCollection<CarsRentalModel>();
-            InitializeConnection();
+
+            CarsRental = [];
             BtnSaveChangedCommand = new AsyncRelayCommand(SaveChanges);
         }
 
-        private async void InitializeConnection()
+        private async Task SaveChanges()
+        {
+            
+        }
+        public async void ConnectToSignalR()
         {
             try
             {
-                _connection = new HubConnectionBuilder().WithUrl("https://localhost:7160/carhub").Build();
+                _hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:7160/carhub").Build();
 
-                _connection.On<ObservableCollection<CarsRentalModel>>("ReceiveCars", cars =>
-                {
-                    Dispatcher.UIThread.Invoke(() =>
+                _hubConnection.On<CarsRentalModel>("ReceiveCarUpdate", (car) => {
+                    Console.WriteLine($"Received update for car ID: {car.Id}");
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        var existingCar = CarsRental.FirstOrDefault(c => c.Id == car.Id);
+                        if (existingCar != null)
+                        {
+                            existingCar.Mark = car.Mark;
+                            existingCar.Model = car.Model;
+                            existingCar.Years = car.Years;
+                            existingCar.Color = car.Color;
+                            existingCar.HorsePower = car.HorsePower;
+                            existingCar.Mileage = car.Mileage;
+                            existingCar.Engine = car.Engine;
+                            existingCar.Price = car.Price;
+                            existingCar.City = car.City;
+                            existingCar.Status = car.Status;
+                        }
+                        else
+                        {
+                            CarsRental.Add(car);
+                        }
+                    });
+                });
+                _hubConnection.On<int>("ReceiveCarDelete", (carId) => {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        var carToRemove = CarsRental.FirstOrDefault(c => c.Id == carId);
+                        if (carToRemove != null)
+                        {
+                            CarsRental.Remove(carToRemove);
+                        }
+                    });
+                });            
+                _hubConnection.On<ObservableCollection<CarsRentalModel>>("ReceiveCars", (cars) => {
+                    Dispatcher.UIThread.Post(() =>
                     {
                         CarsRental.Clear();
                         foreach (var car in cars)
@@ -54,38 +86,27 @@ namespace Rolling.ViewModels
                         }
                     });
                 });
+                
+                await _hubConnection.StartAsync();
+                await _hubConnection.InvokeAsync("GetCars");
+            }
+            catch (Exception ex)
+            {
+                _mainWindowViewModel.Notification("Server", "Error SignalR connection", true, false, 3, true);
+                Console.WriteLine($"Error starting SignalR connection: {ex.Message}");
+            }
+        }
+        public async Task StopConnection()
+        {
+            if (_hubConnection != null)
+            {
+                _hubConnection.Remove("ReceiveCarUpdate");
+                _hubConnection.Remove("ReceiveCarDelete");
+                _hubConnection.Remove("ReceiveCars");
 
-                await _connection.StartAsync();
-                await LoadCars();
-            }
-            catch (HttpRequestException ex)
-            {
-                _mainWindowViewModel.Notification("Server Error", $"{ex.StatusCode} {ex.Message}", true, false, 3, true);
-            }
-            catch (SocketException ex)
-            {
-                _mainWindowViewModel.Notification("Server Error(socket)", $"{ex.SocketErrorCode} {ex.Message}", true, false, 3, true);
-            }
-        }
-        private async Task LoadCars()
-        {
-            await _connection.InvokeAsync("GetCars");
-
-        }
-        private async Task SaveChanges()
-        {
-            if (CarsRental.Count != 0)
-            {
-                await _connection.InvokeAsync("SaveChangesCars", CarsRental);
-            }
-        }
-        public async Task CloseConnectionAsync()
-        {
-            if (_connection != null && _connection.State == HubConnectionState.Connected)
-            {
-                await _connection.StopAsync();
-                await _connection.DisposeAsync();
-            }
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
+            }      
         }
     }
 }

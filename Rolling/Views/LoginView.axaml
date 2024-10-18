@@ -13,8 +13,11 @@
 	</Design.DataContext>
 	
 	<Grid>
-        <actipro:ShadowChrome Elevation="8" IsShadowEnabled="True" MaxWidth="1200" MaxHeight="800" MinHeight="450" MinWidth="1000"
-                              HorizontalAlignment="Center" VerticalAlignment="Center">
+		<actipro:RingSpinner Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding IsLoad}"
+		                     Foreground="#5aabac" LineThickness="12" LineCap="Flat" IsSpinning="True" />
+		
+		<actipro:ShadowChrome Elevation="8" IsShadowEnabled="True" MaxWidth="1200" MaxHeight="800" MinHeight="450" MinWidth="1000" IsVisible="{Binding IsLoggedIn}"
+		                      HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

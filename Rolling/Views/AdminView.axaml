@@ -25,7 +25,7 @@
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Mark" Binding="{Binding Mark}" />
                 <DataGridTextColumn Header="Model" Binding="{Binding Model}" />
-                <DataGridTextColumn Header="Year" Binding="{Binding Year}" />
+                <DataGridTextColumn Header="Year" Binding="{Binding Years}" />
                 <DataGridTextColumn Header="Color" Binding="{Binding Color}" />
                 <DataGridTextColumn Header="Horse Power" Binding="{Binding HorsePower}" />
                 <DataGridTextColumn Header="Mileage" Binding="{Binding Mileage}" />

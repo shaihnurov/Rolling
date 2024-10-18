@@ -32,10 +32,10 @@
                 
 	                <TextBox Grid.Row="2" Watermark="Enter your Name" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Name}"/>
-                
-	                <TextBox Grid.Row="3" Watermark="Age" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
-	                         Margin="0 20 0 0" Text="{Binding Age}"/>
-                
+	                
+	                <NumericUpDown Grid.Row="3" Watermark="Age" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft" Margin="0 20 0 0" 
+	                               Minimum="18" Maximum="100" Increment="1" Value="18" Text="{Binding Age}"/>
+	                
 	                <TextBox Grid.Row="4" Watermark="Email" HorizontalAlignment="Center" Width="200" TextAlignment="Center" Classes="theme-soft"
 	                         Margin="0 20 0 0" TextWrapping="Wrap" Text="{Binding Email}"/>
                 

@@ -85,7 +85,7 @@
 			    
 			    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" ZIndex="99">
 				    <actipro:InfoBar Severity="{Binding StatusInfoBar}" Title="{Binding TitleTextInfoBar}" IsVisible="{Binding IsInfoBarVisible}"
-				                     Message="{Binding MessageInfoBar}" HorizontalAlignment="Right" 
+				                     Message="{Binding MessageInfoBar}" IsWrapped="True" HorizontalAlignment="Right" 
 				                     VerticalAlignment="Top" Margin="20" CanClose="False">
 					    
 					    <actipro:InfoBar.Action>

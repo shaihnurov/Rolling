@@ -1,6 +1,6 @@
 using System;
 
-namespace Rolling.Models;
+namespace Server.Model;
 
 public class UserData
 {

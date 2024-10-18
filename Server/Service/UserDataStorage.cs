@@ -1,8 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Server.Model;
 
-namespace Rolling.Models;
+namespace Server.Service;
 
 public class UserDataStorage
 {

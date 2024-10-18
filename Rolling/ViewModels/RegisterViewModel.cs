@@ -1,34 +1,30 @@
 using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Mail;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
-using Rolling.Models;
+using Microsoft.AspNetCore.SignalR.Client;
+using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
-    public class RegisterViewModel : ObservableObject
+    public class RegisterViewModel : ObservableObject, IServerConnectionHandler
     {
-        private const string FromPassword = "uvos umpw nqqh lxpk";
-        private const string FromAddress = "shaihnurov3@gmail.com";
-        private string _verifyCode;
-        
         private string _name;
         private string _age;
         private string _email;
         private string _password;
         private string _code;
+        private string _verifycode;
         private Button _regBtn;
         private bool _isVisibleUserData = true;
         private bool _isVisibleInputCode;
         
         private readonly MainWindowViewModel _mainWindowViewModel;
+        private HubConnection _hubConnection;
+
         public AsyncRelayCommand RegisterUserCommand { get; set; }
         public AsyncRelayCommand ConfirmCodeRegCommand { get; set; }
 
@@ -112,105 +108,11 @@ namespace Rolling.ViewModels
 
         private async Task BtnSendCodeUser()
         {
-            /*using (ApplicationContextDb db = new())
-            {
-                var uniqueEmail = await db.UserModels.Where(s => s.Email == Email).ToListAsync();
-
-                if (uniqueEmail.Count == 0)
-                {
-                    IsVisibleInputCode = true;
-                    IsVisibleUserData = false;
-                    
-                    _verifyCode = GenerateCode();
-                    await SendVerificationCode(Email, _verifyCode);
-                }
-                else
-                {
-                    _mainWindowViewModel.Notification("Register", "This mail is occupied by another user", true, false, 3, true);
-                }
-            }*/
+            await _hubConnection.InvokeAsync("CheckUserEmail", Name, Email);
         }
         private async Task RegisterUser()
         {
-            /*using (ApplicationContextDb db = new())
-            {
-                if (_verifyCode == Code)
-                {
-                    var userData = new UserData
-                    {
-                        Email = Email
-                    };
-
-                    await UserDataStorage.SaveUserData(userData);
-                    _mainWindowViewModel.UserService.UpdateUserData();
-                    
-                    var userModel = new UserModel
-                    {
-                        Name = Name,
-                        Age = int.Parse(Age),
-                        Email = Email,
-                        Password = BCrypt.Net.BCrypt.HashPassword(Password),
-                        Level = 1,
-                        Permission = "User"
-                    };
-                
-                    await db.UserModels.AddAsync(userModel);
-                    await db.SaveChangesAsync();
-
-                    _mainWindowViewModel.IsVisibleBtnUserAcc = true;
-                    _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
-                    
-                    _mainWindowViewModel.Notification("Register", "Registration successfully completed", true, false, 1, true);
-                    
-                    _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
-                }
-                else
-                {
-                    _mainWindowViewModel.Notification("Register", "You have entered an invalid code", true, false, 3, true);
-                }
-            }*/
-        }
-        private string GenerateCode()
-        {
-            byte[] data = new byte[6];
-            RandomNumberGenerator.Fill(data);
-            return BitConverter.ToString(data).Replace("-", "").Substring(0, 6);
-        }
-        private async Task SendVerificationCode(string email, string code)
-        {
-            var fromAddress = new MailAddress(FromAddress, "Rolling");
-            var toAddress = new MailAddress(email);
-            
-            const string subject = "Registering an account with Rolling";
-            string body = $"{Name}, your confirmation code - {code}";
-
-            var smtp = new SmtpClient()
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromAddress.Address, FromPassword)
-            };
-
-            try
-            {
-                using var message = new MailMessage(fromAddress, toAddress)
-                {
-                    Subject = subject,
-                    Body = body
-                };
-                smtp.Send(message);
-            }
-            catch (SmtpException)
-            {
-                _mainWindowViewModel.Notification("Register", $"Error sending confirmation code to mail {email}", true, false, 3, true);
-            }
-            catch (Exception)
-            {
-                _mainWindowViewModel.Notification("Register", "There was an internal error", true, false, 3, true);
-            }
+            await _hubConnection.InvokeAsync("RegisterUser", Name, int.Parse(Age), Email, Password, Code, _verifycode);
         }
         private bool IsNumeric(string age)
         {
@@ -219,6 +121,58 @@ namespace Rolling.ViewModels
         private bool IsValidEmail(string email)
         {
             return !string.IsNullOrEmpty(email) && email.Contains("@") && email.Contains(".");
+        }
+        public async void ConnectToSignalR()
+        {
+            try
+            {
+                _hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:7160/registerhub").Build();
+                
+                _hubConnection.On<string>("CheckUserEmail", verifycode => {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        IsVisibleInputCode = true;
+                        IsVisibleUserData = false;
+                        _verifycode = verifycode;
+                    });
+                });
+                _hubConnection.On("RegisterUser", () => {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        _mainWindowViewModel.IsVisibleBtnUserAcc = true;
+                        _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
+                    
+                        _mainWindowViewModel.Notification("Register", "Registration successfully completed", true, false, 1, true);
+                    
+                        _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
+                    });
+                });
+                _hubConnection.On<string>("RegisterError", result => {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        _mainWindowViewModel.Notification("Register", result, true, false, 3, true);
+                    });
+                });
+                
+                await _hubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                _mainWindowViewModel.Notification("Server", "Error SignalR connection", true, false, 3, true);
+                Console.WriteLine($"Error starting SignalR connection: {ex.Message}");
+            }
+        }
+        public async Task StopConnection()
+        {
+            if (_hubConnection != null)
+            {
+                _hubConnection.Remove("ReceiveCarUpdate");
+                _hubConnection.Remove("ReceiveCarDelete");
+                _hubConnection.Remove("ReceiveCars");
+
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
+            }      
         }
     }
 }

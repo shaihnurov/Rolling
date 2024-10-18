@@ -1,25 +1,20 @@
-using System.Linq;
-using System.Security.AccessControl;
+using System;
 using System.Threading.Tasks;
-using ActiproSoftware.UI.Avalonia.Controls;
-using Avalonia.Animation;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR.Client;
 using Rolling.Models;
 using Rolling.Service;
 
 namespace Rolling.ViewModels;
 
-public class UserProfileViewModel : ObservableObject
+public class UserProfileViewModel : ObservableObject, IServerConnectionHandler
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
-    private readonly IUserService _userService;
-    private readonly GeoLocationService _geoLocationService;
+    private HubConnection _hubConnection;
 
     private string _address;
-    private bool _isLoading;
-
     private string _userName;
     private string _userEmail;
     private string _userAge;
@@ -29,11 +24,6 @@ public class UserProfileViewModel : ObservableObject
     {
         get => _address;
         set => SetProperty(ref _address, value);
-    }
-    public bool IsLoading
-    {
-        get => _isLoading;
-        set => SetProperty(ref _isLoading, value);
     }
     public string UserName
     {
@@ -56,28 +46,20 @@ public class UserProfileViewModel : ObservableObject
         set => SetProperty(ref _userLevel, value);
     }
 
-    public RelayCommand ExitAccountCommand { get; set; }
+    public AsyncRelayCommand ExitAccountCommand { get; set; }
     
-    public UserProfileViewModel(MainWindowViewModel mainWindowViewModel, IUserService userService)
+    public UserProfileViewModel(MainWindowViewModel mainWindowViewModel)
     {
         _mainWindowViewModel = mainWindowViewModel;
-        _geoLocationService = new GeoLocationService();
-        _userService = userService;
 
         _mainWindowViewModel.TryAgainLocationCommand = new AsyncRelayCommand(GetLocation);
-
-        _userService.UserDataChanged += async () => await LoadDataUser();
-        Task.Run(async () => {
-            await LoadDataUser();
-            await GetLocation();
-        });
         
-        ExitAccountCommand = new RelayCommand(Exit);
+        ExitAccountCommand = new AsyncRelayCommand(Exit);
     }
     
     private async Task GetLocation()
     {
-        IsLoading = true;
+        /*IsLoading = true;
         var location = await _geoLocationService.GetLocation();
 
         if (location != null)
@@ -99,30 +81,59 @@ public class UserProfileViewModel : ObservableObject
             _mainWindowViewModel.Notification("Location", "Failed to get location", true, true, 3, false);
         }
 
-        IsLoading = false;
+        IsLoading = false;*/
     }
-    private void Exit()
+    private async Task Exit()
     {
-        UserDataStorage.DeleteUserData();
-        _mainWindowViewModel.TitleText = "Auth";
-        _mainWindowViewModel.IsVisibleBtnUserAcc = false;
-        _mainWindowViewModel.IsVisibleBtnAuthOrReg = true;
-        _mainWindowViewModel.CurrentView = new LoginViewModel(_mainWindowViewModel);
+        await _hubConnection.InvokeAsync("ExitAccount");
     }
-    private async Task LoadDataUser()
+    public async void ConnectToSignalR()
     {
-        /*using (ApplicationContextDb db = new()) 
+        try
         {
-            UserData userData = await UserDataStorage.GetUserData();
-            var user = await db.UserModels.Where(s => s.Email == userData.Email).ToListAsync();
+            _hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:7160/userprofilehub").Build();
+            
+            _hubConnection.On<UserModel, string>("ReturnCurrentUser", (userData, location) => {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    UserName = userData.Name;
+                    UserEmail = userData.Email;
+                    UserAge = userData.Age.ToString();
+                    UserLevel = userData.Level;
+                    Address = location;
+                });
+            });
+            _hubConnection.On("ExitAccount", ()=> {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    _mainWindowViewModel.TitleText = "Auth";
+                    _mainWindowViewModel.IsVisibleBtnUserAcc = false;
+                    _mainWindowViewModel.IsVisibleBtnAuthOrReg = true;
+                    _mainWindowViewModel.CurrentView = new LoginViewModel(_mainWindowViewModel);
+                    
+                    _mainWindowViewModel.Notification("Account", "You have successfully logged out of your account", true, false, 2, true);
+                });
+            });
+            
+            await _hubConnection.StartAsync();
+            await _hubConnection.InvokeAsync("LoadUserData");
+        }
+        catch (Exception ex)
+        {
+            _mainWindowViewModel.Notification("Server", "Error SignalR connection", true, false, 3, true);
+            Console.WriteLine($"Error starting SignalR connection: {ex.Message}");
+        }
+    }
+    public async Task StopConnection()
+    {
+        if (_hubConnection != null)
+        {
+            _hubConnection.Remove("ReceiveCarUpdate");
+            _hubConnection.Remove("ReceiveCarDelete");
+            _hubConnection.Remove("ReceiveCars");
 
-            foreach (var item in user)
-            {
-                UserName = item.Name;
-                UserEmail = item.Email;
-                UserAge = item.Age.ToString();
-                UserLevel = item.Level;
-            }
-        }*/
+            await _hubConnection.StopAsync();
+            await _hubConnection.DisposeAsync();
+        }      
     }
 }

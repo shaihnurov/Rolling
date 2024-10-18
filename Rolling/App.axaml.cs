@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Rolling.Models;
 using Rolling.Service;
@@ -13,6 +14,7 @@ namespace Rolling;
 
 public partial class App : Application
 {
+    private HubConnection _connection;
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -22,17 +24,22 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Line below is needed to remove Avalonia data validation.
-            // Without this line you will get duplicate validations from both Avalonia and CT
             BindingPlugins.DataValidators.RemoveAt(0);
-            var serviceProvider = new ServiceCollection().AddSingleton<IUserService, UserService>().BuildServiceProvider();
-            var userService = serviceProvider.GetRequiredService<IUserService>();
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(userService),
+                DataContext = new MainWindowViewModel(),
             };
+            desktop.Exit += OnExit;
         }
-
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private async void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        if (_connection != null && _connection.State == HubConnectionState.Connected)
+        {
+            await _connection.StopAsync();
+            await _connection.DisposeAsync();
+        }
     }
 }
