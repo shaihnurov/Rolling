@@ -1,15 +1,16 @@
 using System;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
-    public class LoginViewModel : ObservableObject, IServerConnectionHandler
+    public class LoginViewModel : BaseViewModel
     {
         private bool _isCheckedSaveData;
         private bool _isLoad;
@@ -19,7 +20,6 @@ namespace Rolling.ViewModels
         private Button _regBtn;
 
         private readonly MainWindowViewModel _mainWindowViewModel;
-        private HubConnection _hubConnection;
         
         public AsyncRelayCommand RegisterUserCommand { get; set; }
 
@@ -64,7 +64,7 @@ namespace Rolling.ViewModels
             set => SetProperty(ref _regBtn, value);
         }
         
-        public LoginViewModel(MainWindowViewModel mainWindowViewModel)
+        public LoginViewModel(MainWindowViewModel mainWindowViewModel) : base("authhub")
         {
             _mainWindowViewModel = mainWindowViewModel;
 
@@ -85,20 +85,15 @@ namespace Rolling.ViewModels
             });
         }
         
-        public async void ConnectToSignalR()
+        public override async Task ConnectToSignalR()
         {
             try
             {
-                _hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:7160/authhub").Build();
+                await base.ConnectToSignalR();
                 
                 _hubConnection.On<bool>("AuthUser", permission => {
                     Dispatcher.UIThread.Post(() =>
                     {
-                        if(permission)
-                            _mainWindowViewModel.IsVisibleButtonAdmin = false;
-                        else
-                            _mainWindowViewModel.IsVisibleButtonAdmin = true;
-                        
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                         _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
                         
@@ -122,11 +117,6 @@ namespace Rolling.ViewModels
                 _hubConnection.On<bool>("AuthToken", permission => {
                     Dispatcher.UIThread.Post(() =>
                     {
-                        if(permission)
-                            _mainWindowViewModel.IsVisibleButtonAdmin = false;
-                        else
-                            _mainWindowViewModel.IsVisibleButtonAdmin = true;
-                        
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
                         _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
                         IsLoggedIn = true;
@@ -152,32 +142,44 @@ namespace Rolling.ViewModels
                     });
                 });
                 
-                await _hubConnection.StartAsync();
                 await _hubConnection.InvokeAsync("AuthToken");
+            }
+            catch (HttpRequestException ex)
+            {
+                _mainWindowViewModel.Notification("Server", "Failed to connect to the server. Please check your network.", true, false, 3, true);
+                Console.WriteLine($"HttpRequestException: {ex.Message}");
+            }
+            catch (SocketException ex)
+            {
+                _mainWindowViewModel.Notification("Network", "Network error occurred while connecting to the server.", true, false, 3, true);
+                Console.WriteLine($"SocketException: {ex.Message}");
+            }
+            catch (HubException ex)
+            {
+                _mainWindowViewModel.Notification("Server", "Error occurred with the SignalR hub connection.", true, false, 3, true);
+                Console.WriteLine($"HubException: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _mainWindowViewModel.Notification("Error", "An error occurred in the application. Please try again.", true, false, 3, true);
+                Console.WriteLine($"InvalidOperationException: {ex.Message}");
+            }
+            catch (TimeoutException ex)
+            {
+                _mainWindowViewModel.Notification("Timeout", "Connection to the server timed out. Please try again.", true, false, 3, true);
+                Console.WriteLine($"TimeoutException: {ex.Message}");
             }
             catch (Exception ex)
             {
-                _mainWindowViewModel.Notification("Server", "Error SignalR connection", true, false, 3, true);
-                Console.WriteLine($"Error starting SignalR connection: {ex.Message}");
+                _mainWindowViewModel.Notification("Error", "An unexpected error occurred.", true, false, 3, true);
+                Console.WriteLine($"Exception: {ex.Message}");
             }
-        }
-        public async Task StopConnection()
-        {
-            if (_hubConnection != null)
-            {
-                _hubConnection.Remove("ReceiveCarUpdate");
-                _hubConnection.Remove("ReceiveCarDelete");
-                _hubConnection.Remove("ReceiveCars");
-
-                await _hubConnection.StopAsync();
-                await _hubConnection.DisposeAsync();
-            }      
         }
         private async Task AuthUser()
         { 
             await _hubConnection.InvokeAsync("AuthUser", Email, Password, IsCheckedSaveData);
         }
-        private bool IsValidEmail(string email)
+        private static bool IsValidEmail(string email)
         {
             return !string.IsNullOrEmpty(email) && email.Contains("@") && email.Contains(".");
         }

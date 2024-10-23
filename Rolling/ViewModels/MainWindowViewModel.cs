@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Reactive;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.AspNetCore.SignalR.Client;
-using Rolling.Models;
 using Rolling.Service;
-using Rolling.Views;
 
 namespace Rolling.ViewModels
 {
@@ -24,13 +17,13 @@ namespace Rolling.ViewModels
             get => _currentView;
             set
             {
-                if (_currentView is IServerConnectionHandler currentServerConnectionHandler)
+                if (_currentView is IDisposable disposableCurrentView)
                 {
-                    currentServerConnectionHandler.StopConnection();
+                    disposableCurrentView.Dispose();
                 }
-                
+
                 SetProperty(ref _currentView, value);
-                
+
                 if (_currentView is IServerConnectionHandler newServerConnectionHandler)
                 {
                     newServerConnectionHandler.ConnectToSignalR();
@@ -45,7 +38,6 @@ namespace Rolling.ViewModels
         
         private bool _isInfoBarVisible = false;
         private bool _isVisibleButtonInfoBar = false;
-        private bool _isVisibleButtonAdmin = false;
         private string _messageInfoBar;
         private string _titleTextInfoBar;
         private int _statusInfoBar;
@@ -62,11 +54,6 @@ namespace Rolling.ViewModels
         {
             get => _isVisibleButtonInfoBar;
             set => SetProperty(ref _isVisibleButtonInfoBar, value);
-        }
-        public bool IsVisibleButtonAdmin
-        {
-            get => _isVisibleButtonAdmin;
-            set => SetProperty(ref _isVisibleButtonAdmin, value);
         }
         public string MessageInfoBar
         {
@@ -103,13 +90,11 @@ namespace Rolling.ViewModels
         private LoginViewModel LoginViewModel { get; set; }
         private HomeViewModel HomeViewModel { get; set; }
         private UserProfileViewModel UserProfileViewModel { get; set; }
-        private AdminViewModel AdminViewModel { get; set; }
         
         public RelayCommand BtnRegOrAuthCommand { get; set; }
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
         public AsyncRelayCommand TryAgainLocationCommand { get; set; }
-        public RelayCommand AdminViewCommand { get; set; }
         
         public MainWindowViewModel()
         {
@@ -120,7 +105,6 @@ namespace Rolling.ViewModels
             LoginViewModel = new LoginViewModel(this);
             HomeViewModel = new HomeViewModel(this);
             UserProfileViewModel = new UserProfileViewModel(this);
-            AdminViewModel = new AdminViewModel(this);
             
             BtnRegOrAuthCommand = new RelayCommand(() => {
                 if (_state == 0)
@@ -142,10 +126,6 @@ namespace Rolling.ViewModels
             UserProfileCommand = new RelayCommand(() => {
                 CurrentView = UserProfileViewModel;
                 TitleText = "Profile";
-            });
-            AdminViewCommand = new RelayCommand(() => {
-                CurrentView = AdminViewModel;
-                TitleText = "Admin Controls";
             });
             
             CurrentView = LoginViewModel;

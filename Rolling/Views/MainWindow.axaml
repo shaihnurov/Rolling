@@ -48,8 +48,8 @@
 				<primitives:OverlayInputFilter>
 					<StackPanel Margin="{Binding $parent[actipro:ChromedTitleBar].HasCaptionButtons, Converter={StaticResource RightContentMarginConverter}}" Orientation="Horizontal">
 						<Button ContentTemplate="{actipro:GlyphTemplate Error16}"
-						        Command="{Binding AdminViewCommand}"
-						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleButtonAdmin}"
+						        Command="{Binding }"
+						        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="False"
 						        ToolTip.Tip="Admin Page"/>
 						
 						<Button ContentTemplate="{actipro:GlyphTemplate Options16}"

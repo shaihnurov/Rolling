@@ -27,7 +27,7 @@ public partial class App : Application
             BindingPlugins.DataValidators.RemoveAt(0);
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel()
             };
             desktop.Exit += OnExit;
         }
@@ -36,7 +36,7 @@ public partial class App : Application
 
     private async void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        if (_connection != null && _connection.State == HubConnectionState.Connected)
+        if (_connection.State == HubConnectionState.Connected)
         {
             await _connection.StopAsync();
             await _connection.DisposeAsync();

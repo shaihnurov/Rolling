@@ -1,101 +1,135 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
+using Rolling.Models;
+using Rolling.Service;
 
 namespace Rolling.ViewModels;
 
-public class HomeViewModel : ObservableObject
+public class HomeViewModel : BaseViewModel
 {
-    private HubConnection _connection;
+    private readonly IDialogService _dialogService;
     private readonly MainWindowViewModel _mainWindowViewModel;
+    private ObservableCollection<CarsRentalModels> _rentalCars;
 
-    private ObservableCollection<string> _chatBox;
-    private string _login;
-    private string _message;
-
-    public ObservableCollection<string> ChatBox
+    public ObservableCollection<CarsRentalModels> RentalCars
     {
-        get => _chatBox;
-        set => SetProperty(ref _chatBox, value);
-    }
-    public string Login
-    {
-        get => _login;
-        set => SetProperty(ref _login, value);
-    }
-    public string Message
-    {
-        get => _message;
-        set => SetProperty(ref _message, value);
+        get => _rentalCars;
+        set => SetProperty(ref _rentalCars, value);
     }
 
-    public RelayCommand SendCommand { get; set; }
+    public AsyncRelayCommand<object> OpenDialogCommand { get; set; }
 
-    public HomeViewModel(MainWindowViewModel mainWindowViewModel)
+    public HomeViewModel(MainWindowViewModel mainWindowViewModel) : base("rentalcarhub")
     {
+        _dialogService = new DialogService();
         _mainWindowViewModel = mainWindowViewModel;
-        ChatBox = new ObservableCollection<string>();
-        InitializeConnection();
+        RentalCars = [];
 
-        SendCommand = new RelayCommand(Send);
+        OpenDialogCommand = new AsyncRelayCommand<object>(OpenDialog);
     }
 
-    private async void InitializeConnection()
+    private async Task OpenDialog(object parameter)
+    {
+        if (parameter is CarsRentalModels selectedCar)
+        {
+            await _dialogService.ShowDialogAsync(selectedCar.Mark, selectedCar.Model, selectedCar.Id, selectedCar.Years, selectedCar.Color, selectedCar.HorsePower, selectedCar.Mileage, selectedCar.Engine, selectedCar.City, selectedCar.Price, selectedCar.Status);
+        }
+    }
+    public override async Task ConnectToSignalR()
     {
         try
         {
-            _connection = new HubConnectionBuilder().WithUrl("https://localhost:7160/chat").Build();
+            await base.ConnectToSignalR();
 
-            _connection.On<string, string>("ReceiveChat", (user, message) =>
-            {
-                Dispatcher.UIThread.Invoke(() =>
+            _hubConnection.On<CarsRentalModels>("UpdateCars", (car) => {
+                Dispatcher.UIThread.Post(() =>
                 {
-                    var newMessage = $"{user}: {message}";
-                    ChatBox.Insert(0, newMessage);
+                    var existingCar = RentalCars.FirstOrDefault(c => c.Id == car.Id);
+                    if (existingCar != null)
+                    {
+                        existingCar.Mark = car.Mark;
+                        existingCar.Model = car.Model;
+                        existingCar.Years = car.Years;
+                        existingCar.Color = car.Color;
+                        existingCar.HorsePower = car.HorsePower;
+                        existingCar.Mileage = car.Mileage;
+                        existingCar.Engine = car.Engine;
+                        existingCar.Price = car.Price;
+                        existingCar.City = car.City;
+                        existingCar.Status = car.Status;
+                    }
+                    else
+                    {
+                        RentalCars.Add(car);
+                    }
                 });
             });
-
-            await Test();
+            _hubConnection.On<int>("DeleteCars", (carId) => {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    var carToRemove = RentalCars.FirstOrDefault(c => c.Id == carId);
+                    if (carToRemove != null)
+                    {
+                        RentalCars.Remove(carToRemove);
+                    }
+                });
+            });
+            _hubConnection.On<ObservableCollection<CarsRentalModels>>("RentalCarsList", (cars) => {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    RentalCars.Clear();
+                    foreach (var car in cars)
+                    {
+                        RentalCars.Add(car);
+                    }
+                });
+            });
+            _hubConnection.On("RentalCarsListInvalidLocation", ()=> {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    _mainWindowViewModel.Notification("Application", "Failed to detect the cars around you", true, false, 3, true);
+                });
+            });
+            
+            await _hubConnection.InvokeAsync("GetCars");
         }
         catch (HttpRequestException ex)
         {
-            _mainWindowViewModel.Notification("Server Error", $"{ex.StatusCode} {ex.Message}", true, false, 3, true);
+            _mainWindowViewModel.Notification("Server", "Failed to connect to the server. Please check your network.", true, false, 3, true);
+            Console.WriteLine($"HttpRequestException: {ex.Message}");
         }
         catch (SocketException ex)
         {
-            _mainWindowViewModel.Notification("Server Error(socket)", $"{ex.SocketErrorCode} {ex.Message}", true, false, 3, true);
+            _mainWindowViewModel.Notification("Network", "Network error occurred while connecting to the server.", true, false, 3, true);
+            Console.WriteLine($"SocketException: {ex.Message}");
         }
-    }
-
-    private async Task Test()
-    {
-        try
+        catch (HubException ex)
         {
-            await _connection.StartAsync();
-            ChatBox.Add("Вы успешно вошли в чат");
+            _mainWindowViewModel.Notification("Server", "Error occurred with the SignalR hub connection.", true, false, 3, true);
+            Console.WriteLine($"HubException: {ex.Message}");
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            ChatBox.Add(ex.Message);
+            _mainWindowViewModel.Notification("Error", "An error occurred in the application. Please try again.", true, false, 3, true);
+            Console.WriteLine($"InvalidOperationException: {ex.Message}");
         }
-    }
-    private async void Send()
-    {
-        try
+        catch (TimeoutException ex)
         {
-            await _connection.InvokeAsync("Send", Login, Message);
+            _mainWindowViewModel.Notification("Timeout", "Connection to the server timed out. Please try again.", true, false, 3, true);
+            Console.WriteLine($"TimeoutException: {ex.Message}");
         }
         catch (Exception ex)
         {
-            ChatBox.Add(ex.Message);
+            _mainWindowViewModel.Notification("Error", "An unexpected error occurred.", true, false, 3, true);
+            Console.WriteLine($"Exception: {ex.Message}");
         }
     }
 }

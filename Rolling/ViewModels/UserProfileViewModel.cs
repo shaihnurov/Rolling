@@ -1,18 +1,20 @@
 using System;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Rolling.Models;
 using Rolling.Service;
 
 namespace Rolling.ViewModels;
 
-public class UserProfileViewModel : ObservableObject, IServerConnectionHandler
+public class UserProfileViewModel : BaseViewModel
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
-    private HubConnection _hubConnection;
 
     private string _address;
     private string _userName;
@@ -48,7 +50,7 @@ public class UserProfileViewModel : ObservableObject, IServerConnectionHandler
 
     public AsyncRelayCommand ExitAccountCommand { get; set; }
     
-    public UserProfileViewModel(MainWindowViewModel mainWindowViewModel)
+    public UserProfileViewModel(MainWindowViewModel mainWindowViewModel) : base("userprofilehub")
     {
         _mainWindowViewModel = mainWindowViewModel;
 
@@ -83,15 +85,11 @@ public class UserProfileViewModel : ObservableObject, IServerConnectionHandler
 
         IsLoading = false;*/
     }
-    private async Task Exit()
-    {
-        await _hubConnection.InvokeAsync("ExitAccount");
-    }
-    public async void ConnectToSignalR()
+    public override async Task ConnectToSignalR()
     {
         try
         {
-            _hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:7160/userprofilehub").Build();
+            await base.ConnectToSignalR();
             
             _hubConnection.On<UserModel, string>("ReturnCurrentUser", (userData, location) => {
                 Dispatcher.UIThread.Post(() =>
@@ -115,25 +113,41 @@ public class UserProfileViewModel : ObservableObject, IServerConnectionHandler
                 });
             });
             
-            await _hubConnection.StartAsync();
             await _hubConnection.InvokeAsync("LoadUserData");
+        }
+        catch (HttpRequestException ex)
+        {
+            _mainWindowViewModel.Notification("Server", "Failed to connect to the server. Please check your network.", true, false, 3, true);
+            Console.WriteLine($"HttpRequestException: {ex.Message}");
+        }
+        catch (SocketException ex)
+        {
+            _mainWindowViewModel.Notification("Network", "Network error occurred while connecting to the server.", true, false, 3, true);
+            Console.WriteLine($"SocketException: {ex.Message}");
+        }
+        catch (HubException ex)
+        {
+            _mainWindowViewModel.Notification("Server", "Error occurred with the SignalR hub connection.", true, false, 3, true);
+            Console.WriteLine($"HubException: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _mainWindowViewModel.Notification("Error", "An error occurred in the application. Please try again.", true, false, 3, true);
+            Console.WriteLine($"InvalidOperationException: {ex.Message}");
+        }
+        catch (TimeoutException ex)
+        {
+            _mainWindowViewModel.Notification("Timeout", "Connection to the server timed out. Please try again.", true, false, 3, true);
+            Console.WriteLine($"TimeoutException: {ex.Message}");
         }
         catch (Exception ex)
         {
-            _mainWindowViewModel.Notification("Server", "Error SignalR connection", true, false, 3, true);
-            Console.WriteLine($"Error starting SignalR connection: {ex.Message}");
+            _mainWindowViewModel.Notification("Error", "An unexpected error occurred.", true, false, 3, true);
+            Console.WriteLine($"Exception: {ex.Message}");
         }
     }
-    public async Task StopConnection()
+    private async Task Exit()
     {
-        if (_hubConnection != null)
-        {
-            _hubConnection.Remove("ReceiveCarUpdate");
-            _hubConnection.Remove("ReceiveCarDelete");
-            _hubConnection.Remove("ReceiveCars");
-
-            await _hubConnection.StopAsync();
-            await _hubConnection.DisposeAsync();
-        }      
+        await _hubConnection.InvokeAsync("ExitAccount");
     }
 }
