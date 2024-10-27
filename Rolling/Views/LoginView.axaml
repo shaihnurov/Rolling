@@ -16,10 +16,16 @@
 		<actipro:RingSpinner Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding IsLoad}"
 		                     Foreground="#5aabac" LineThickness="12" LineCap="Flat" IsSpinning="True" />
 		
+		<Button ContentTemplate="{actipro:GlyphTemplate Refresh16}" Width="150" Height="150"
+		        Command="{Binding ReconnectCommand}"
+		        Theme="{actipro:ControlTheme TitleBarButton}" IsVisible="{Binding IsVisibleReconnectBtn}"
+		        ToolTip.Tip="Reconnect"/>
+		
 		<actipro:ShadowChrome Elevation="8" IsShadowEnabled="True" MaxWidth="1200" MaxHeight="800" MinHeight="450" MinWidth="1000" IsVisible="{Binding IsLoggedIn}"
 		                      HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -43,6 +49,14 @@
                 
                 <ToggleSwitch Grid.Row="5" Classes="theme-solid warning" Content="Stay on the account?" HorizontalAlignment="Center" Margin="0 20 0 0"
                               HorizontalContentAlignment="Center" IsChecked="{Binding IsCheckedSaveData}"/>
+                
+                <TextBlock Grid.Row="6" Margin="0 40 0 0">
+	                <Run>You don't have an account yet? </Run>
+	                <InlineUIContainer>
+		                <actipro:HyperlinkTextBlock Command="{Binding CreateAccountCommand}">Create one</actipro:HyperlinkTextBlock>
+	                </InlineUIContainer>
+	                <Run> for more information</Run>
+                </TextBlock>
             </Grid>
 		</actipro:ShadowChrome>
 	</Grid>

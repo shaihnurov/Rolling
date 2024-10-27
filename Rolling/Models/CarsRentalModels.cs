@@ -1,10 +1,11 @@
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Rolling.Models;
 
 public class CarsRentalModels : ObservableObject
 {
-    private int _id;
+    private Guid _id;
     private string _mark;
     private string _model;
     private int _years;
@@ -17,7 +18,7 @@ public class CarsRentalModels : ObservableObject
     private bool _status;
     private byte[]? _image;
 
-    public int Id
+    public Guid Id
     {
         get => _id;
         set => SetProperty(ref _id, value);

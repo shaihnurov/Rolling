@@ -27,6 +27,7 @@ namespace Rolling.ViewModels
 
         public AsyncRelayCommand RegisterUserCommand { get; set; }
         public AsyncRelayCommand ConfirmCodeRegCommand { get; set; }
+        public RelayCommand SignInAccountCommand { get; set; }
 
         public string Name
         {
@@ -104,6 +105,7 @@ namespace Rolling.ViewModels
                 }
             });
             ConfirmCodeRegCommand = new AsyncRelayCommand(RegisterUser);
+            SignInAccountCommand = new RelayCommand(SignInAccount);
         }
         
         public override async Task ConnectToSignalR()
@@ -124,7 +126,6 @@ namespace Rolling.ViewModels
                     Dispatcher.UIThread.Post(() =>
                     {
                         _mainWindowViewModel.IsVisibleBtnUserAcc = true;
-                        _mainWindowViewModel.IsVisibleBtnAuthOrReg = false;
                     
                         _mainWindowViewModel.Notification("Register", "Registration successfully completed", true, false, 1, true);
                     
@@ -168,6 +169,11 @@ namespace Rolling.ViewModels
                 _mainWindowViewModel.Notification("Error", "An unexpected error occurred.", true, false, 3, true);
                 Console.WriteLine($"Exception: {ex.Message}");
             }
+        }
+        private void SignInAccount()
+        {
+            _mainWindowViewModel.TitleText = "Auth";
+            _mainWindowViewModel.CurrentView = new LoginViewModel(_mainWindowViewModel);
         }
         private async Task BtnSendCodeUser()
         {

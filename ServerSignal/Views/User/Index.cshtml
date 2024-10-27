@@ -1,0 +1,39 @@
+﻿@model List<Rolling.Models.UserModel>
+
+@{
+}
+
+<h1>Users List</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Age</th>
+        <th>Level</th>
+        <th>Permission</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>@item.Id</td>
+        <td>@item.Name</td>
+        <td>@item.Email</td>
+        <td>@item.Age</td>
+        <td>@item.Level</td>
+        <td>@item.Permission</td>
+        <td><a class="btn btn-primary" href="@Url.Action("Edit", "User", new { id = item.Id })">Edit</a></td>
+        <td>
+            <form asp-action="Delete" asp-controller="User" method="post">
+                <input type="hidden" name="Id" value="@item.Id" />
+                <button type="submit" class="btn btn-danger">Delete User</button>
+            </form>
+        </td>
+    </tr>
+    }
+    </tbody>
+</table>

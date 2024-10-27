@@ -1,0 +1,29 @@
+﻿@model Rolling.Models.UserModel
+
+@{
+}
+
+<h1>Edit User</h1>
+<form method="post" asp-action="Edit" asp-controller="User" class="mt-5">
+    <div class="mb-3">
+        <label for="" class="form-label">Name</label>
+        <input type="text" class="form-control" asp-for="Name">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Email</label>
+        <input type="email" class="form-control"  asp-for="Email">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Age</label>
+        <input type="number" class="form-control" asp-for="Age">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Level</label>
+        <input type="number" class="form-control" asp-for="Level">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Permission</label>
+        <input type="text" class="form-control" asp-for="Permission">
+    </div>
+    <button type="submit" class="btn btn-primary" asp-action="Edit" asp-controller="User">Submit</button>
+</form>

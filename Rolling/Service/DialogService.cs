@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Rolling.ViewModels;
@@ -8,10 +9,10 @@ namespace Rolling.Service;
 
 public class DialogService : IDialogService
 {
-    public async Task<string?> ShowDialogAsync(string mark, string model, int id, int year, string color, int horsePower, int mileage, double engine, string location, double price, bool status)
+    public async Task<string?> ShowDialogAsync(MainWindowViewModel mainWindowViewModel, string mark, string model, Guid id, int year, string color, int horsePower, int mileage, double engine, string location, double price, bool status, byte[] image)
     {
         var dialogWindow = new DialogWindow();
-        dialogWindow.DataContext = new DialogWindowViewModel(dialogWindow, mark, model, id, year, color, horsePower, mileage, engine, location, price, status);
+        dialogWindow.DataContext = new DialogWindowViewModel(mainWindowViewModel, dialogWindow, mark, model, id, year, color, horsePower, mileage, engine, location, price, status, image);
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

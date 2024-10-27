@@ -1,0 +1,56 @@
+﻿@model Rolling.Models.CarsRentalModels
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h1>Add Car</h1>
+<form method="post" asp-action="Add" asp-controller="RentalCars" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="" class="form-label">Mark</label>
+        <input type="text" class="form-control" asp-for="Mark">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Model</label>
+        <input type="text" class="form-control"  asp-for="Model">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Year</label>
+        <input type="number" class="form-control" asp-for="Years">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Color</label>
+        <input type="text" class="form-control" asp-for="Color">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Horse Power</label>
+        <input type="number" class="form-control" asp-for="HorsePower">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Mileage</label>
+        <input type="number" class="form-control" asp-for="Mileage">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Engine</label>
+        <input type="number" class="form-control" asp-for="Engine" step="any">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">Price</label>
+        <input type="number" class="form-control" asp-for="Price" step="any">
+    </div>
+    <div class="mb-3">
+        <label for="" class="form-label">City</label>
+        <input type="text" class="form-control" asp-for="City">
+    </div>
+    <div class="mb-3">
+        <label for="imageFile" class="form-label">Upload Image</label>
+        <input type="file" class="form-control" id="imageFile" name="imageFile">
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1" asp-for="Status">
+        <label class="form-check-label" for="exampleCheck1">Rental status</label>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

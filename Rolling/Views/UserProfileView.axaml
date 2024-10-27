@@ -59,7 +59,7 @@
                             <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}"
                                        Text="Balance "/>
                             <TextBlock Foreground="{actipro:ThemeResource DefaultForegroundBrushTertiary}">
-                                <Run Text="0"/>
+                                <Run Text="{Binding UserBalance}"/>
                                 <Run Text="$"/>
                             </TextBlock>
                         </WrapPanel>

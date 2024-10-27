@@ -18,6 +18,5 @@ sealed class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
-            .RegisterActiproLicense("Future Actipro Customer",
-                "AVA242-AVYDT-FBHLB-W5V64-4V3H");
+            .RegisterActiproLicense("Future Actipro Customer", "AVA242-TVYDT-FTHLB-W5VF4-4VZH");
 }

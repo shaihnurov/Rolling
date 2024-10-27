@@ -1,0 +1,147 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Rolling.ViewModels"
+             xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+             xmlns:service="clr-namespace:Rolling.Service"
+             x:DataType="vm:ListRentalViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1250"
+             x:Class="Rolling.Views.ListRentalView">
+    
+    <Design.DataContext>
+        <vm:ListRentalViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Resources>
+        <service:ByteArrayToBitmapConverter x:Key="ByteArrayToBitmapConverter"/>
+        <service:ImageToVisibilityConverter x:Key="ImageToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <WrapPanel Grid.Row="0" Classes="sample-layout-panel" HorizontalAlignment="Center">
+                <Panel Height="{actipro:ScaledDouble 10+40}" Margin="0 20 0 0">
+                    <actipro:MeshGradientPresenter Height="100" Background="#ffed8fea" CornerRadius="10" Width="350">
+                        <actipro:MeshGradientNode Center="1%, 95%" Color="#ffb781fd" />
+                        <actipro:MeshGradientNode Center="30%, 0%" Color="#ffb781fd" />
+                        <actipro:MeshGradientNode Center="99%, 37%" Color="#ffeec6ad" />
+                        <actipro:MeshGradientNode Center="83%, 95%" Color="#ffeec6ad" />
+                    </actipro:MeshGradientPresenter>		
+                    <Viewbox Stretch="Uniform">
+                        <Viewbox.Effect>
+                            <DropShadowEffect OffsetX="0" OffsetY="1" BlurRadius="5" Opacity="0.2" />
+                        </Viewbox.Effect>
+
+                        <StackPanel Margin="30,20">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="Your Rental Cars" FontSize="23" FontWeight="Bold" Foreground="#ffffff" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Viewbox>
+                </Panel>
+            </WrapPanel>
+            
+            <Grid Grid.Row="1" Margin="50" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <ItemsControl ItemsSource="{Binding ListRental}" x:Name="Items">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{actipro:ThemeResource Container3BackgroundBrush}" 
+                                        Height="450" MinWidth="350" CornerRadius="10"
+                                        BorderBrush="{actipro:ThemeResource Container3BorderBrush}" 
+                                        BorderThickness="2" Margin="20">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                                            <TextBlock Text="{Binding Mark}" FontSize="22" FontWeight="Normal" Margin="0 0 5 0" 
+                                                       FontFamily="{actipro:ThemeResource CodeFontFamily}"/>
+                                            <TextBlock Text="{Binding Model}" FontSize="22" FontWeight="Normal" 
+                                                       FontFamily="{actipro:ThemeResource CodeFontFamily}"/>
+                                        </StackPanel>
+                                        
+                                        <WrapPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                            <TextBlock Text="Rent up to" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                            <TextBlock Text="{Binding EndDate}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                        </WrapPanel>
+
+                                        <Grid Grid.Row="2" HorizontalAlignment="Center" Margin="20 0 20 0" Width="200" Height="250">
+                                            <Image x:Name="CarImage"
+                                                   Source="{Binding Image, Converter={StaticResource ByteArrayToBitmapConverter}}"
+                                                   Width="200" Height="250"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                            <TextBlock Text="No Image" FontSize="20" FontWeight="Normal"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       IsVisible="{Binding ElementName=CarImage, Path=Source, Converter={StaticResource ImageToVisibilityConverter}}"/>
+                                        </Grid>
+                                        
+                                        <TextBlock Grid.Row="3" Text="Technical information" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Normal"
+                                                                Margin="0 15 0 0" FontFamily="{actipro:ThemeResource CodeFontFamily}"/>
+                        
+                                        <Grid Grid.Row="4" HorizontalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            
+                                            <WrapPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                                <TextBlock Text="Year" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                                <TextBlock Text="{Binding Years}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                            </WrapPanel>
+                                            
+                                            <WrapPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                                <TextBlock Text="Color" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                                <TextBlock Text="{Binding Color}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                            </WrapPanel>
+                                            
+                                            <WrapPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                                <TextBlock Text="Horse Power" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                                <TextBlock Text="{Binding HorsePower}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                            </WrapPanel>
+                                            
+                                            <WrapPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                                <TextBlock Text="Mileage" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                                <TextBlock Text="{Binding Mileage}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                            </WrapPanel>
+                                            
+                                            <WrapPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10 1 10 1">
+                                                <TextBlock Text="Engine" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Margin="0 0 5 0"/>
+                                                <TextBlock Text="{Binding Engine}" FontSize="17" FontFamily="{actipro:ThemeResource DefaultFontFamily}" Foreground="{actipro:ThemeResource NotificationBorderBrushWarning}" />
+                                            </WrapPanel>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,60 @@
+﻿@model List<Rolling.Models.CarsRentalModels>
+
+@{
+}
+
+<h1>Rental Cars List</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Mark</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>Color</th>
+        <th>Horse Power</th>
+        <th>Mileage</th>
+        <th>Engine</th>
+        <th>Price</th>
+        <th>City</th>
+        <th>Status Rental</th>
+        <th>Image</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>@item.Id</td>
+        <td>@item.Mark</td>
+        <td>@item.Model</td>
+        <td>@item.Years</td>
+        <td>@item.Color</td>
+        <td>@item.HorsePower</td>
+        <td>@item.Mileage</td>
+        <td>@item.Engine</td>
+        <td>@item.Price</td>
+        <td>@item.City</td>
+        <td>@item.Status</td>
+        <td>
+            @if (item.Image != null)
+            {
+            <img src="data:image;base64,@Convert.ToBase64String(item.Image)" alt="Car Image" width="100" />
+            }
+            else
+            {
+            <p>No Image</p>
+            }
+        </td>
+        <td><a class="btn btn-primary" href="@Url.Action("Edit", "RentalCars", new { id = item.Id })">Edit</a></td>
+        <td>
+            <form asp-action="Delete" asp-controller="RentalCars" method="post">
+                <input type="hidden" name="Id" value="@item.Id" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </td>
+    </tr>
+    }
+    </tbody>
+</table>

@@ -7,6 +7,7 @@ namespace ServerSignal.Models
     {
         public DbSet<UserModel> UserModels => Set<UserModel>();
         public DbSet<CarsRentalModels> CarsRentalModels => Set<CarsRentalModels>();
+        public DbSet<ListRentalsModel> ListRentalsModels => Set<ListRentalsModel>();
 
         public ApplicationContextDb(DbContextOptions<ApplicationContextDb> options) : base(options) { }
     }

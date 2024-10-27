@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.CookiePolicy;
 using ServerSignal.Extensions;
 using ServerSignal.Hub;
 using ServerSignal.Models;
+using ServerSignal.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<RentalCarHub>();
 builder.Services.AddSingleton<SubscribeRentalCarsTableDependency>();
 builder.Services.AddApiAuthentication(builder.Configuration);
+builder.Services.AddHostedService<RentalExpirationService>();
 
 builder.Services.AddCors(options =>
 {
@@ -63,7 +65,7 @@ app.MapHub<RegisterHub>("/registerhub");
 app.MapHub<AuthHub>("/authhub");
 app.MapHub<UserProfileHub>("/userprofilehub");
 app.MapHub<RentalCarHub>("/rentalcarhub");
-app.MapHub<ChatHub>("/chat");
+app.MapHub<ConfirmRentalCarHub>("/confrimrentalcar");
 
 app.UseSqlTableDependency<SubscribeRentalCarsTableDependency>(connectionString);
 

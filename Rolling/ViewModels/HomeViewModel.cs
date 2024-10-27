@@ -40,7 +40,7 @@ public class HomeViewModel : BaseViewModel
     {
         if (parameter is CarsRentalModels selectedCar)
         {
-            await _dialogService.ShowDialogAsync(selectedCar.Mark, selectedCar.Model, selectedCar.Id, selectedCar.Years, selectedCar.Color, selectedCar.HorsePower, selectedCar.Mileage, selectedCar.Engine, selectedCar.City, selectedCar.Price, selectedCar.Status);
+            await _dialogService.ShowDialogAsync(_mainWindowViewModel, selectedCar.Mark, selectedCar.Model, selectedCar.Id, selectedCar.Years, selectedCar.Color, selectedCar.HorsePower, selectedCar.Mileage, selectedCar.Engine, selectedCar.City, selectedCar.Price, selectedCar.Status, selectedCar.Image!);
         }
     }
     public override async Task ConnectToSignalR()
@@ -72,7 +72,7 @@ public class HomeViewModel : BaseViewModel
                     }
                 });
             });
-            _hubConnection.On<int>("DeleteCars", (carId) => {
+            _hubConnection.On<Guid>("DeleteCars", (carId) => {
                 Dispatcher.UIThread.Post(() =>
                 {
                     var carToRemove = RentalCars.FirstOrDefault(c => c.Id == carId);

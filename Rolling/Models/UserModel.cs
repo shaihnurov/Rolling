@@ -9,4 +9,5 @@ public class UserModel
     public string Password { get; set; }
     public int Level { get; set; }
     public string Permission { get; set; }
+    public double Balance { get; set; }
 }

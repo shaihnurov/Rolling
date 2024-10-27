@@ -62,6 +62,7 @@ public abstract class BaseViewModel : ObservableObject, IServerConnectionHandler
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"HTTP Request Error: {ex.Message}");
+            await ConnectToSignalR();
         }
         catch (SocketException ex)
         {

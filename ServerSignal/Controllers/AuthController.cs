@@ -51,7 +51,7 @@ public class AuthController : Controller
         {
             HttpOnly = true,
             Secure = true,
-            Expires = DateTime.UtcNow.AddMinutes(1)
+            Expires = DateTime.UtcNow.AddHours(1)
         });
 
         return RedirectToAction("Index", "Home");

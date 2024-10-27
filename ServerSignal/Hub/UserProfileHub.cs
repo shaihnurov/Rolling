@@ -18,7 +18,7 @@ public class UserProfileHub : Microsoft.AspNetCore.SignalR.Hub
     {
         UserData userData = await UserDataStorage.GetUserData();
 
-        var currentUser = _db.UserModels.Where(x => x.Email == userData.Email).Select(user => new { user.Id, user.Name, user.Email, user.Age, user.Level}).FirstOrDefault();
+        var currentUser = _db.UserModels.Where(x => x.Email == userData.Email).Select(user => new { user.Id, user.Name, user.Email, user.Age, user.Level, user.Balance}).FirstOrDefault();
         
         await Clients.Caller.SendAsync("ReturnCurrentUser", currentUser, userData.Location);
     }

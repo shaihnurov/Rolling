@@ -9,6 +9,6 @@ public static class ApplicationBuilderExtension
     {
         var serviceProvider = applicationBuilder.ApplicationServices;
         var service = serviceProvider.GetService<T>();
-        service.SubscribeTableDependency(connectionString);
+        service!.SubscribeTableDependency(connectionString);
     }
 }

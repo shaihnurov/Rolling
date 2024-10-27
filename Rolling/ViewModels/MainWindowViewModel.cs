@@ -10,7 +10,6 @@ namespace Rolling.ViewModels
     {
         private int _state = 0;
         private object _currentView;
-        private string _btnRegOrAuthText;
         
         public object CurrentView
         {
@@ -30,18 +29,12 @@ namespace Rolling.ViewModels
                 }
             }
         }
-        public string BtnRegOrAuthText
-        {
-            get => _btnRegOrAuthText;
-            set => SetProperty(ref _btnRegOrAuthText, value);
-        }
         
         private bool _isInfoBarVisible = false;
         private bool _isVisibleButtonInfoBar = false;
         private string _messageInfoBar;
         private string _titleTextInfoBar;
         private int _statusInfoBar;
-        private bool _isVisibleBtnAuthOrReg;
         private bool _isVisibleBtnUserAcc;
         private string _titleText;
         
@@ -75,11 +68,6 @@ namespace Rolling.ViewModels
             get => _isVisibleBtnUserAcc;
             set => SetProperty(ref _isVisibleBtnUserAcc, value);
         }
-        public bool IsVisibleBtnAuthOrReg
-        {
-            get => _isVisibleBtnAuthOrReg;
-            set => SetProperty(ref _isVisibleBtnAuthOrReg, value);
-        }
         public string TitleText
         {
             get => _titleText;
@@ -90,35 +78,23 @@ namespace Rolling.ViewModels
         private LoginViewModel LoginViewModel { get; set; }
         private HomeViewModel HomeViewModel { get; set; }
         private UserProfileViewModel UserProfileViewModel { get; set; }
+        private ListRentalViewModel ListRentalViewModel { get; set; }
         
-        public RelayCommand BtnRegOrAuthCommand { get; set; }
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
+        public RelayCommand ListRentalCommand { get; set; }
         public AsyncRelayCommand TryAgainLocationCommand { get; set; }
         
         public MainWindowViewModel()
         {
-            BtnRegOrAuthText = "Do you have an account yet?";
-            TitleText = "Procces Authentication";
+            TitleText = "Process Authentication";
             
             RegisterViewModel = new RegisterViewModel(this);
             LoginViewModel = new LoginViewModel(this);
             HomeViewModel = new HomeViewModel(this);
             UserProfileViewModel = new UserProfileViewModel(this);
+            ListRentalViewModel = new ListRentalViewModel(this);
             
-            BtnRegOrAuthCommand = new RelayCommand(() => {
-                if (_state == 0)
-                {
-                    CurrentView = RegisterViewModel;
-                    BtnRegOrAuthText = "You don't have an account yet?";
-                    _state++;
-                }else if (_state == 1)
-                {
-                    CurrentView = LoginViewModel;
-                    BtnRegOrAuthText = "Do you have an account yet?";
-                    _state--;
-                }
-            });
             HomeViewCommand = new RelayCommand(() => {
                 CurrentView = HomeViewModel;
                 TitleText = "Home";
@@ -127,9 +103,12 @@ namespace Rolling.ViewModels
                 CurrentView = UserProfileViewModel;
                 TitleText = "Profile";
             });
+            ListRentalCommand = new RelayCommand(() =>
+            {
+                CurrentView = ListRentalViewModel;
+            });
             
             CurrentView = LoginViewModel;
-            IsVisibleBtnAuthOrReg = true;
         }
         
         public async void Notification(string title, string message, bool visibleInfoBar, bool visibleBtnInfoBar, int statusCode, bool timeLife)

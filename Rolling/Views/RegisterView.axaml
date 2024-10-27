@@ -25,6 +25,7 @@
 		                <RowDefinition Height="Auto"/>
 		                <RowDefinition Height="Auto"/>
 		                <RowDefinition Height="Auto"/>
+		                <RowDefinition Height="Auto"/>
 	                </Grid.RowDefinitions>
 
 	                <TextBlock Grid.Row="1" Text="Registration" HorizontalAlignment="Center" Margin="0 40 0 0" TextTrimming="CharacterEllipsis"
@@ -45,6 +46,14 @@
                 
 	                <Button Grid.Row="6" HorizontalAlignment="Center" Margin="0 40 0 0" Content="Register"
 	                        Command="{Binding RegisterUserCommand}" IsEnabled="{Binding RegBtn}"/>
+	                
+	                <TextBlock Grid.Row="7" Margin="0 40 0 0" HorizontalAlignment="Center">
+		                <Run>Already have an account? </Run>
+		                <InlineUIContainer>
+			                <actipro:HyperlinkTextBlock Command="{Binding SignInAccountCommand}">Sign in</actipro:HyperlinkTextBlock>
+		                </InlineUIContainer>
+		                <Run> for more information</Run>
+	                </TextBlock>
                 </Grid>
 	            
 	            <Grid IsVisible="{Binding IsVisibleInputCode}">
