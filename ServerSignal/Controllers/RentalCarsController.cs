@@ -31,10 +31,13 @@ namespace ServerSignal.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(CarsRentalModels carsRentalModels, IFormFile imageFile)
         {
-            using (var ms = new MemoryStream())
+            if (imageFile != null)
             {
-                await imageFile.CopyToAsync(ms);
-                carsRentalModels.Image = ms.ToArray();
+                using (var ms = new MemoryStream())
+                {
+                    await imageFile.CopyToAsync(ms);
+                    carsRentalModels.Image = ms.ToArray();
+                }
             }
             
             var rentalCar = new CarsRentalModels
@@ -88,10 +91,13 @@ namespace ServerSignal.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(CarsRentalModels carsRentalModels, IFormFile imageFile)
         {
-            using (var ms = new MemoryStream())
+            if (imageFile != null)
             {
-                await imageFile.CopyToAsync(ms);
-                carsRentalModels.Image = ms.ToArray();
+                using (var ms = new MemoryStream())
+                {
+                    await imageFile.CopyToAsync(ms);
+                    carsRentalModels.Image = ms.ToArray();
+                }
             }
             
             var sql = @"UPDATE CarsRentalModels SET Mark = @Mark, Model = @Model, Years = @Years, Color = @Color, HorsePower = @HorsePower, Mileage = @Mileage, Engine = @Engine, Price = @Price, City = @City, Status = @Status, Image = @Image WHERE Id = @Id";
@@ -110,7 +116,7 @@ namespace ServerSignal.Controllers
                     new SqlParameter("@City", carsRentalModels.City),
                     new SqlParameter("@Status", carsRentalModels.Status),
                     new SqlParameter("@Id", carsRentalModels.Id),
-                    new SqlParameter("@Image", carsRentalModels.Image)
+                    new SqlParameter("@Image", carsRentalModels.Image != null ? new SqlParameter("@Image", carsRentalModels.Image) : new SqlParameter("@Image", DBNull.Value))
                 );
             }
             catch (DbUpdateException ex)
