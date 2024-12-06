@@ -101,6 +101,8 @@
 			    <Grid.RowDefinitions>
 				    <RowDefinition Height="*"/>
 			    </Grid.RowDefinitions>
+			    
+			    
 			
 			    <Border Grid.Row="0">
 				    <ContentControl Content="{Binding CurrentView}"/>

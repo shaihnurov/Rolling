@@ -23,7 +23,6 @@ public abstract class BaseViewModel : ObservableObject, IServerConnectionHandler
     {
         if (_hubConnection != null)
         {
-            Console.WriteLine("Already connected or connecting. Please wait...");
             return;
         }
 

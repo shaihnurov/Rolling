@@ -16,11 +16,6 @@ namespace Rolling.ViewModels
             get => _currentView;
             set
             {
-                if (_currentView is IDisposable disposableCurrentView)
-                {
-                    disposableCurrentView.Dispose();
-                }
-
                 SetProperty(ref _currentView, value);
 
                 if (_currentView is IServerConnectionHandler newServerConnectionHandler)

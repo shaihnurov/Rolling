@@ -74,7 +74,7 @@ public class UserProfileViewModel : BaseViewModel
                 {
                     UserName = userData.Name;
                     UserEmail = userData.Email;
-                    UserAge = userData.Age.ToString();
+                    UserAge = userData.Age.ToString()!;
                     UserLevel = userData.Level;
                     UserBalance = userData.Balance;
                     Address = location;

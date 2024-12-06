@@ -123,7 +123,7 @@ namespace Rolling.ViewModels
                         
                         _mainWindowViewModel.Notification("Auth", "Successful entry", true, false, 1, true);
                         
-                        _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
+                        _mainWindowViewModel.CurrentView = new UserProfileViewModel(_mainWindowViewModel);
                     });
                 });
                 _hubConnection.On<string>("AuthErrorNotFound", result => {
@@ -146,7 +146,7 @@ namespace Rolling.ViewModels
                         IsLoad = false;                        
                         _mainWindowViewModel.Notification("Auth", "Successful entry", true, false, 1, true);
                         
-                        _mainWindowViewModel.CurrentView = new HomeViewModel(_mainWindowViewModel);
+                        _mainWindowViewModel.CurrentView = new UserProfileViewModel(_mainWindowViewModel);
                     });
                 });
                 _hubConnection.On<string>("AuthInvalidToken", result => {

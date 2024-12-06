@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
@@ -34,12 +35,12 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private async void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
+    private void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
     {
         if (_connection.State == HubConnectionState.Connected)
         {
-            await _connection.StopAsync();
-            await _connection.DisposeAsync();
+            _connection.StopAsync(); 
+            _connection.DisposeAsync();
         }
     }
 }
