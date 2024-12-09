@@ -27,4 +27,8 @@
       <AdditionalFiles Include="Views\Auth\Login.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Chat\Index.cshtml" />
+    </ItemGroup>
+
 </Project>

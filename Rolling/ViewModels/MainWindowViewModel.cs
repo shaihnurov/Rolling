@@ -2,13 +2,15 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rolling.Models;
 using Rolling.Service;
 
 namespace Rolling.ViewModels
 {
     public class MainWindowViewModel : ObservableObject
     {
-        private int _state = 0;
+        private DialogService _dialogService;
+
         private object _currentView;
         
         public object CurrentView
@@ -78,7 +80,7 @@ namespace Rolling.ViewModels
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand UserProfileCommand { get; set; }
         public RelayCommand ListRentalCommand { get; set; }
-        public AsyncRelayCommand TryAgainLocationCommand { get; set; }
+        public AsyncRelayCommand SupportChatCommand { get; set; }
         
         public MainWindowViewModel()
         {
@@ -102,12 +104,15 @@ namespace Rolling.ViewModels
             {
                 CurrentView = ListRentalViewModel;
             });
-            
+            SupportChatCommand = new AsyncRelayCommand(OpenDialogSupport);
+
             CurrentView = LoginViewModel;
         }
         
         public async void Notification(string title, string message, bool visibleInfoBar, bool visibleBtnInfoBar, int statusCode, bool timeLife)
         {
+            _dialogService = new DialogService();
+
             TitleTextInfoBar = title;
             MessageInfoBar = message;
             IsVisibleButtonInfoBar = visibleBtnInfoBar;
@@ -119,6 +124,10 @@ namespace Rolling.ViewModels
                 await Task.Delay(3000);
                 IsInfoBarVisible = false;
             }
+        }
+        private async Task OpenDialogSupport()
+        {
+            await _dialogService.ShowDialogAsync(this);
         }
     }
 }

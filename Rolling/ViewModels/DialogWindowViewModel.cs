@@ -10,11 +10,13 @@ namespace Rolling.ViewModels;
 
 public class DialogWindowViewModel : ObservableObject
 {
-    private Window _window;
+    private readonly Window _window;
     private object _currentView;
     private readonly MainWindowViewModel _mainWindowViewModel;
     
-    private InfoRentalCatViewModel _infoRentalCatViewModel;
+    private readonly InfoRentalCatViewModel _infoRentalCatViewModel;
+    private readonly SupportChatViewModel _supportChatViewModel;
+
 
     public object CurrentView
     {
@@ -37,5 +39,14 @@ public class DialogWindowViewModel : ObservableObject
 
         _infoRentalCatViewModel = new InfoRentalCatViewModel(window, mark, model, id, year, color, horsePower, mileage, engine, location, price, status, image, _mainWindowViewModel, this);
         CurrentView = _infoRentalCatViewModel;
+    }
+
+    public DialogWindowViewModel(MainWindowViewModel mainWindowViewModel, Window window)
+    {
+        _window = window;
+        _mainWindowViewModel = mainWindowViewModel;
+
+        _supportChatViewModel = new SupportChatViewModel(mainWindowViewModel, window);
+        CurrentView = _supportChatViewModel;
     }
 }

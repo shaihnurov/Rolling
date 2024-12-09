@@ -21,4 +21,17 @@ public class DialogService : IDialogService
 
         return null;
     }
+
+    public async Task<string?> ShowDialogAsync(MainWindowViewModel mainWindowViewModel)
+    {
+        var dialogWindow = new DialogWindow();
+        dialogWindow.DataContext = new DialogWindowViewModel(mainWindowViewModel, dialogWindow);
+
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return await dialogWindow.ShowDialog<string>(desktop.MainWindow);
+        }
+
+        return null;
+    }
 }

@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ApplicationContextDb>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<RentalCarHub>();
+builder.Services.AddScoped<ChatHub>();
 builder.Services.AddSingleton<SubscribeRentalCarsTableDependency>();
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddHostedService<RentalExpirationService>();
@@ -66,6 +67,7 @@ app.MapHub<AuthHub>("/authhub");
 app.MapHub<UserProfileHub>("/userprofilehub");
 app.MapHub<RentalCarHub>("/rentalcarhub");
 app.MapHub<ConfirmRentalCarHub>("/confrimrentalcar");
+app.MapHub<ChatHub>("/supportChat");
 
 app.UseSqlTableDependency<SubscribeRentalCarsTableDependency>(connectionString);
 
